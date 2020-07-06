@@ -10,7 +10,7 @@ const initialState = {
   books: [],
 };
 
-const appReducer = (state = initialState, { type, payload }) => {
+const libraryReducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case typeName:
       return { ...state, ...payload };
@@ -29,4 +29,4 @@ export const getLibrary = () => async (dispatch) => {
   const library = await AsyncStorage.getItem(ASYNC_STORAGE_KEY);
 };
 
-export default appReducer;
+export default libraryReducer;
