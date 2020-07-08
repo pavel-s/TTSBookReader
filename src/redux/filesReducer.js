@@ -1,7 +1,6 @@
-import AsyncStorage from '@react-native-community/async-storage';
+//TODO: permissions
 import * as FileSystem from 'expo-file-system';
 
-const ASYNC_STORAGE_KEY = 'FILES';
 const REQUEST_DIRECTORY = 'TTSBookReader/filesReducer/REQUEST_DIRECTORY';
 const SET_DIRECTORY = 'TTSBookReader/filesReducer/SET_DIRECTORY';
 const REQUEST_BOOK_FILE = 'TTSBookReader/filesReducer/REQUEST_BOOK_FILE';
@@ -14,7 +13,7 @@ const initialState = {
     isFetching: false,
     wasRead: false,
     json: null,
-  }, //id
+  },
   directory: {
     name: 'root',
     path: 'file:///storage/emulated/0',
@@ -69,7 +68,6 @@ export const readDirectory = (path, name) => async (dispatch) => {
       wasRead: false,
     })
   );
-  console.log(path);
 
   try {
     const entriesNames = await FileSystem.readDirectoryAsync(path);
@@ -78,7 +76,6 @@ export const readDirectory = (path, name) => async (dispatch) => {
       const entry = await FileSystem.getInfoAsync(path + '/' + entriesNames[i]);
       entries.push({ name: entriesNames[i], ...entry });
     }
-    console.log('dir read ok');
     dispatch(
       setDirectory({
         name,
@@ -104,7 +101,7 @@ export const readBookFile = (path, name) => async (dispatch) => {
       json: null,
     })
   );
-  console.log(path);
+  console.log('read file: ' + path);
 
   try {
     const bookString = await FileSystem.readAsStringAsync(path);
@@ -122,7 +119,7 @@ export const readBookFile = (path, name) => async (dispatch) => {
         json: book,
       })
     );
-    return { error: false };
+    return { error: false, book };
   } catch (error) {
     console.log(error);
     dispatch(

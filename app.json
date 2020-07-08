@@ -19,6 +19,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "com.ttsbookreader",
+      "versionCode": 1
     }
   }
 }

@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Library from './screens/Library/Library';
 import Reader from './screens/Reader/Reader';
 import Settings from './screens/Settings/Settings';
+import { useSelector } from 'react-redux';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -46,6 +47,7 @@ const AppBar = ({ nav }) => {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState();
+  const activeBook = useSelector((state) => state.library.activeBook);
   const ref = React.useRef(null);
 
   useEffect(() => {
@@ -77,12 +79,14 @@ export default function App() {
   }, [isReady]);
 
   if (!isReady) {
-    return <ActivityIndicator />;
+    return (
+      <View style={styles.spinner}>
+        <ActivityIndicator />
+      </View>
+    );
   }
   return (
-    <>
-      {/* <StatusBar /> */}
-      <SafeAreaView />
+    <SafeAreaView style={{ flex: 1 }}>
       <AppBar nav={ref} />
 
       <NavigationContainer
@@ -95,12 +99,15 @@ export default function App() {
       >
         <Drawer.Navigator initialRouteName='Library'>
           <Drawer.Screen name='Library' component={Library} />
-          <Drawer.Screen name='Reader' component={Reader} />
+          {activeBook && <Drawer.Screen name='Reader' component={Reader} />}
           <Drawer.Screen name='Settings' component={Settings} />
         </Drawer.Navigator>
       </NavigationContainer>
-    </>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({ block: { height: 100 } });
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  spinner: { flex: 1, justifyContent: 'center' },
+});
