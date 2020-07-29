@@ -10,6 +10,7 @@ const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
 const SET_TOTAL_CHAPTERS = 'TTSBookReader/readerReducer/SET_TOTAL_CHAPTERS';
 
+//todo: add in progress state
 /**
  * @typedef {Object} State
  * @property {String} status
@@ -98,7 +99,6 @@ export const speakAll = (index) => async (dispatch, getState) => {
   const paragraphIndex = index > -1 ? index : state.reader.current.paragraph;
 
   const currentChapterIndex = state.reader.current.chapter;
-  if (!currentChapterIndex) return;
 
   const strings = state.reader.current.content;
 
@@ -191,7 +191,6 @@ export const getChapter = () => async (dispatch, getState) => {
   // dispatch(setQueue({ [chapterIndex]: paragraphs }));
 
   dispatch(setCurrent({ ...book.bookmark, content: paragraphs }));
-  //todo: continue parseAndSet?
 };
 
 export default readerReducer;
