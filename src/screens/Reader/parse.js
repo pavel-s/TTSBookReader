@@ -1,5 +1,8 @@
 import { DOMParser } from 'xmldom';
 
+/**
+ * @return {[{text: String, after: String, before: String}]} - after, before - src
+ */
 export const parseChapterHtml = (
   raw,
   settings = { method: 'byChildNodes' }
@@ -21,6 +24,10 @@ export const parseChapterHtml = (
     default:
       return [];
   }
+};
+
+export const parseChapterHtmlAsync = async (raw, settings) => {
+  return parseChapterHtml(raw, settings);
 };
 
 /**

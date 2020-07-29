@@ -7,13 +7,29 @@ const SET_ACTIVE_BOOK = 'TTSBookReader/libraryReducer/SET_ACTIVE_BOOK';
 const SET_BOOKMARK = 'TTSBookReader/libraryReducer/SET_BOOKMARK';
 const CLEAR_LIBRARY = 'TTSBookReader/libraryReducer/CLEAR_LIBRARY';
 
+/**
+ * @typedef {Object} Book
+ * @property {chapter: String, paragraph: Number} bookmark
+ */
+
+/**
+ * @typedef {Object} State
+ * @property {Boolean} fetched
+ * @property {Boolean} isFetching
+ * @property {String} activeBook
+ * @property {[Book]} books
+ */
+
 const initialState = {
   fetched: false,
   isFetching: false,
-  activeBook: null, //id
+  activeBook: null,
   books: [],
 };
 
+/**
+ * @param {State} state
+ */
 const libraryReducer = (state = initialState, { type, payload }) => {
   // console.log('library reducer payload: ' + JSON.stringify(payload));
   switch (type) {
@@ -79,6 +95,7 @@ export const setBookmark = (payload) => ({
   payload,
 });
 
+//TODO: add dispatch(resetReader())
 export const clearLibrary = () => ({
   type: CLEAR_LIBRARY,
 });

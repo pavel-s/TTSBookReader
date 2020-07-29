@@ -1,88 +1,105 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, ScrollView, StyleSheet, Image, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, Paragraph, Button } from 'react-native-paper';
-import { readBookFile } from '../../redux/filesReducer';
-import { parseChapterHtml } from './parse';
 import NavButton from './NavButton';
-import { setBookmark } from '../../redux/libraryReducer';
+import {
+  getChapter,
+  speakAll,
+  stopSpeaking,
+  TTS_STATUSES,
+  goToChapter,
+} from '../../redux/readerReducer';
 
 const Reader = () => {
-  const book = useSelector((state) => {
-    if (!state.library.activeBook) {
-      return { error: true, message: 'No active Book' };
-    }
-    const book = state.library.books.find((book) => {
-      return book.id === state.library.activeBook;
-    });
-    return book || { error: true, message: 'Book not found' };
-  });
-
-  const bookFile = useSelector((state) => state.files.bookFile);
+  console.log('render Reader');
   const dispatch = useDispatch();
+  const scrollRef = useRef(null);
 
+  // Y offsets for paragraphs
+  const layoutRef = useRef({});
+
+  const ttsStatus = useSelector((state) => state.reader.status);
+  const isSpeaking = ttsStatus === TTS_STATUSES.speaking;
+
+  const current = useSelector((state) => state.reader.current);
+
+  const totalChapters = useSelector((state) => state.reader.totalChapters);
+
+  //initially request chapter content
   useEffect(() => {
-    if (book && !book.error) {
-      if (book.file.path !== bookFile.path || !bookFile.wasRead) {
-        dispatch(readBookFile(book.file.path, book.file.name));
-      }
-    }
-  }, [book]);
+    dispatch(getChapter());
+  }, []);
 
-  if (!book || !bookFile.wasRead || bookFile.isFetching) {
+  //scroll to top when navigate between chapters
+  useEffect(() => {
+    scrollRef.current &&
+      scrollRef.current.scrollTo({ x: 0, y: 0, animated: true });
+  }, [current.chapter]);
+
+  //scroll to active paragraph
+  useEffect(() => {
+    const currentParagraphOffsetY = layoutRef.current[current.paragraph];
+
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        x: 0,
+        y: currentParagraphOffsetY,
+        animated: true,
+      });
+    }
+  }, [current.paragraph]);
+
+  if (!current.content.length) {
     return <ActivityIndicator style={{ flex: 1 }} />;
   }
-  if (book.error) {
-    return <Text>{book.message}</Text>;
-  }
 
-  const content = parseChapterHtml(
-    bookFile.json.chapters[book.bookmark.chapter].content
-  );
+  const handlePressNav = (prev) => {
+    dispatch(goToChapter(prev ? current.chapter - 1 : current.chapter + 1));
+  };
 
-  const elements = content.reduce((acc, item) => {
+  const handlePressParagraph = (index) => {
+    dispatch(speakAll(index));
+  };
+
+  const elements = current.content.reduce((acc, item, index) => {
     const arr = [];
+
     item.before &&
       arr.push(
         <Image source={item.before} key={acc.length + arr.length + 1} />
       );
     arr.push(
-      <Paragraph key={acc.length + arr.length + 1}>{item.text}</Paragraph>
+      <Paragraph
+        key={acc.length + arr.length + 1}
+        onLayout={(e) => {
+          layoutRef.current[index] = e.nativeEvent.layout.y;
+        }}
+        style={current.paragraph === index ? styles.currentSpeaking : null}
+        onPress={
+          !isSpeaking
+            ? () => handlePressParagraph(index)
+            : () => dispatch(stopSpeaking())
+        }
+      >
+        {item.text}
+      </Paragraph>
     );
     item.after &&
       arr.push(<Image source={item.after} key={acc.length + arr.length + 1} />);
     return [...acc, ...arr];
   }, []);
-  console.log(book.bookmark);
-  const handlePressNext = () => {
-    console.log('go next');
-
-    dispatch(
-      setBookmark({
-        bookId: book.id,
-        bookmark: { chapter: book.bookmark.chapter + 1, paragraph: 0 },
-      })
-    );
-  };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>{elements}</ScrollView>
-      {book.bookmark.chapter > 0 && (
-        <NavButton
-          prev
-          handlePress={() =>
-            dispatch(
-              setBookmark({
-                bookId: book.id,
-                bookmark: { chapter: book.bookmark.chapter - 1, paragraph: 0 },
-              })
-            )
-          }
-        />
+      <ScrollView contentContainerStyle={styles.content} ref={scrollRef}>
+        {elements}
+      </ScrollView>
+      {current.chapter > 0 && (
+        <NavButton prev handlePress={() => handlePressNav(true)} />
       )}
-      {book.bookmark.chapter < bookFile.json.chapters.length - 1 && (
-        <NavButton handlePress={handlePressNext} />
+      {current.chapter < totalChapters - 1 && (
+        <NavButton handlePress={() => handlePressNav()} />
       )}
     </View>
   );
@@ -91,6 +108,9 @@ const Reader = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 10 },
+  currentSpeaking: { backgroundColor: 'lightblue' },
 });
 
 export default Reader;
+
+//onPress={isSpeaking ? () => dispatch(stopSpeaking()) : null}

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import appReducer from './appReducer';
 import filesReducer from './filesReducer';
 import libraryReducer from './libraryReducer';
+import readerReducer from './readerReducer';
 
 const persistConfig = {
   key: 'root',
@@ -16,13 +17,14 @@ const rootReducer = combineReducers({
   app: appReducer,
   files: filesReducer,
   library: libraryReducer,
+  reader: readerReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 function logger({ getState }) {
   return (next) => (action) => {
-    console.log('will dispatch', action.type);
+    // console.log('will dispatch', action.type);
 
     // Call the next dispatch method in the middleware chain.
     const returnValue = next(action);

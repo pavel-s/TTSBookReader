@@ -1,3 +1,4 @@
+import 'react-native-console-time-polyfill';
 import * as React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider as StoreProvider } from 'react-redux';
@@ -5,6 +6,8 @@ import App from './src/App';
 import store, { persistor } from './src/redux/store';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PersistGate } from 'redux-persist/integration/react';
+import { extendMath } from './src/utils/math';
+extendMath();
 
 export default function Main() {
   return (
