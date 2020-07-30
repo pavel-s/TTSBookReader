@@ -12,7 +12,6 @@ import {
 } from '../../redux/readerReducer';
 
 const Reader = () => {
-  console.log('render Reader');
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
@@ -31,14 +30,8 @@ const Reader = () => {
     dispatch(getChapter());
   }, []);
 
-  //scroll to top when navigate between chapters
-  useEffect(() => {
-    scrollRef.current &&
-      scrollRef.current.scrollTo({ x: 0, y: 0, animated: true });
-  }, [current.chapter]);
-
   //scroll to active paragraph
-  useEffect(() => {
+  const scrollToCurrentParagraph = () => {
     const currentParagraphOffsetY = layoutRef.current[current.paragraph];
 
     if (scrollRef.current) {
@@ -48,7 +41,8 @@ const Reader = () => {
         animated: true,
       });
     }
-  }, [current.paragraph]);
+  };
+  useEffect(scrollToCurrentParagraph, [current.paragraph, current.chapter]);
 
   if (!current.content.length) {
     return <ActivityIndicator style={{ flex: 1 }} />;
@@ -92,7 +86,11 @@ const Reader = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} ref={scrollRef}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        ref={scrollRef}
+        onLayout={scrollToCurrentParagraph}
+      >
         {elements}
       </ScrollView>
       {current.chapter > 0 && (

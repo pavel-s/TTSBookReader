@@ -188,7 +188,6 @@ export const getChapter = () => async (dispatch, getState) => {
   const paragraphs = await parseChapterHtmlAsync(
     bookFile.json.chapters[chapterIndex].content
   );
-  // dispatch(setQueue({ [chapterIndex]: paragraphs }));
 
   dispatch(setCurrent({ ...book.bookmark, content: paragraphs }));
 };
