@@ -11,7 +11,7 @@ import {
   setBookmark,
 } from './../../redux/libraryReducer';
 
-enableScreens();
+// enableScreens();
 const Stack = createNativeStackNavigator();
 
 const BooksScreen = React.memo(({ navigation, books }) => {

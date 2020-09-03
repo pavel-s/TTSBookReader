@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, ScrollView, StyleSheet, Image, Text } from 'react-native';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
+import { View, StyleSheet, Image, FlatList, AppState } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { ActivityIndicator, Paragraph, Button } from 'react-native-paper';
+import { ActivityIndicator, Paragraph } from 'react-native-paper';
 import NavButton from './NavButton';
 import {
   getChapter,
@@ -15,15 +15,21 @@ const Reader = () => {
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
-  // Y offsets for paragraphs
-  const layoutRef = useRef({});
-
   const ttsStatus = useSelector((state) => state.reader.status);
-  const isSpeaking = ttsStatus === TTS_STATUSES.speaking;
+  const isSpeaking = useRef();
+  isSpeaking.current = ttsStatus === TTS_STATUSES.speaking;
 
   const current = useSelector((state) => state.reader.current);
-
   const totalChapters = useSelector((state) => state.reader.totalChapters);
+
+  // is App 'active' or 'background'
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  useEffect(() => {
+    const listener = (state) => setAppState(state);
+    AppState.addEventListener('change', listener);
+    return () => AppState.removeEventListener('change', listener);
+  }, []);
 
   //initially request chapter content
   useEffect(() => {
@@ -32,67 +38,86 @@ const Reader = () => {
 
   //scroll to active paragraph
   const scrollToCurrentParagraph = () => {
-    const currentParagraphOffsetY = layoutRef.current[current.paragraph];
-
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        x: 0,
-        y: currentParagraphOffsetY,
-        animated: true,
-      });
+    if (scrollRef.current && appState === 'active') {
+      setTimeout(() => {
+        scrollRef.current.scrollToIndex({
+          animate: false,
+          index: current.paragraph,
+        });
+      }, 50);
     }
   };
-  useEffect(scrollToCurrentParagraph, [current.paragraph, current.chapter]);
+  useEffect(scrollToCurrentParagraph, [
+    current.paragraph,
+    current.chapter,
+    appState,
+  ]);
 
-  if (!current.content.length) {
-    return <ActivityIndicator style={{ flex: 1 }} />;
-  }
+  const handleScrollToIndexFailed = useCallback(
+    ({ index, highestMeasuredFrameIndex }) => {
+      if (
+        index > highestMeasuredFrameIndex &&
+        highestMeasuredFrameIndex + 5 < current.content.length
+      ) {
+        //scroll to +5 paragraph
+        setTimeout(() => {
+          scrollRef.current.scrollToIndex({
+            animate: false,
+            index: highestMeasuredFrameIndex + 5,
+          });
+          //then try scroll to index again
+          setTimeout(() => {
+            scrollRef.current.scrollToIndex({
+              animate: false,
+              index: index,
+            });
+          }, 10);
+        }, 10);
+      }
+    },
+    [current]
+  );
 
   const handlePressNav = (prev) => {
     dispatch(goToChapter(prev ? current.chapter - 1 : current.chapter + 1));
   };
 
   const handlePressParagraph = (index) => {
-    dispatch(speakAll(index));
+    if (isSpeaking.current) {
+      dispatch(stopSpeaking());
+    } else {
+      dispatch(speakAll(index));
+    }
   };
 
-  const elements = current.content.reduce((acc, item, index) => {
-    const arr = [];
+  const renderItem = useCallback(
+    ({ item, index }) =>
+      item.image ? (
+        <Image source={item.image} />
+      ) : (
+        <Paragraph
+          style={current.paragraph === index ? styles.currentSpeaking : null}
+          onPress={() => handlePressParagraph(index)}
+        >
+          {item.text}
+        </Paragraph>
+      ),
+    [current]
+  );
 
-    item.before &&
-      arr.push(
-        <Image source={item.before} key={acc.length + arr.length + 1} />
-      );
-    arr.push(
-      <Paragraph
-        key={acc.length + arr.length + 1}
-        onLayout={(e) => {
-          layoutRef.current[index] = e.nativeEvent.layout.y;
-        }}
-        style={current.paragraph === index ? styles.currentSpeaking : null}
-        onPress={
-          !isSpeaking
-            ? () => handlePressParagraph(index)
-            : () => dispatch(stopSpeaking())
-        }
-      >
-        {item.text}
-      </Paragraph>
-    );
-    item.after &&
-      arr.push(<Image source={item.after} key={acc.length + arr.length + 1} />);
-    return [...acc, ...arr];
-  }, []);
+  if (!current.content.length) {
+    return <ActivityIndicator style={{ flex: 1 }} />;
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
+      <FlatList
         ref={scrollRef}
-        onLayout={scrollToCurrentParagraph}
-      >
-        {elements}
-      </ScrollView>
+        data={current.content}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => 'p' + index}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
+      />
       {current.chapter > 0 && (
         <NavButton prev handlePress={() => handlePressNav(true)} />
       )}
@@ -110,5 +135,3 @@ const styles = StyleSheet.create({
 });
 
 export default Reader;
-
-//onPress={isSpeaking ? () => dispatch(stopSpeaking()) : null}

@@ -20,7 +20,6 @@ export default function App() {
   const [initialState, setInitialState] = useState();
   const activeBook = useSelector((state) => state.library.activeBook);
   const ref = React.useRef(null);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     // dispatch(initTTS());

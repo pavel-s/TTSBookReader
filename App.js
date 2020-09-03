@@ -8,6 +8,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PersistGate } from 'redux-persist/integration/react';
 import { extendMath } from './src/utils/math';
 extendMath();
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 export default function Main() {
   return (

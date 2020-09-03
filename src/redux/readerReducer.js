@@ -1,22 +1,22 @@
 import * as Speech from 'expo-speech';
 import { speak } from '../utils/tts-promise';
 import { readBookFile } from './filesReducer';
-import { parseChapterHtmlAsync } from './../screens/Reader/parse';
 import { setBookmark } from './libraryReducer';
 
 const SET_OPTIONS = 'TTSBookReader/readerReducer/SET_OPTIONS';
 export const TTS_STATUSES = { speaking: 'speaking', paused: 'paused' };
 const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
-const SET_TOTAL_CHAPTERS = 'TTSBookReader/readerReducer/SET_TOTAL_CHAPTERS';
+const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
 
 //todo: add in progress state
 /**
  * @typedef {Object} State
  * @property {String} status
  * @property {Boolean} available
- * @property {{chapter: Number, paragraph: Number, content: []}} current
+ * @property {String} bookId
  * @property {Number} totalChapters
+ * @property {{chapter: Number, paragraph: Number, content: []}} current
  * @property {{pitch: Number, rate: Number, language: String}} options
  */
 
@@ -27,8 +27,9 @@ const SET_TOTAL_CHAPTERS = 'TTSBookReader/readerReducer/SET_TOTAL_CHAPTERS';
 const initialState = {
   status: '',
   available: false,
-  current: { content: [] },
+  bookId: '',
   totalChapters: 0,
+  current: { content: [], chapter: 0, paragraph: 0 },
   options: {
     pitch: 1,
     rate: 2.6,
@@ -55,8 +56,12 @@ const readerReducer = (state = initialState, { type, payload }) => {
       }
       return { ...state, current: newCurrent };
 
-    case SET_TOTAL_CHAPTERS:
-      return { ...state, totalChapters: payload };
+    case SET_BOOK:
+      return {
+        ...state,
+        bookId: payload.id,
+        totalChapters: payload.totalChapters,
+      };
 
     default:
       return state;
@@ -79,13 +84,18 @@ export const setTTSStatus = (payload) => ({
   payload,
 });
 
+//current chapter
 export const setCurrent = (payload) => ({
   type: SET_CURRENT,
   payload,
 });
 
-export const setTotalChapters = (payload) => ({
-  type: SET_TOTAL_CHAPTERS,
+/**
+ *
+ * @param {{id: String, totalChapters: Number}} payload
+ */
+export const setBook = (payload) => ({
+  type: SET_BOOK,
   payload,
 });
 
@@ -95,30 +105,39 @@ export const setTotalChapters = (payload) => ({
  * @return {void}
  */
 export const speakAll = (index) => async (dispatch, getState) => {
-  const state = getState();
+  let state = getState();
   const paragraphIndex = index > -1 ? index : state.reader.current.paragraph;
 
   const currentChapterIndex = state.reader.current.chapter;
 
-  const strings = state.reader.current.content;
+  const content = state.reader.current.content;
 
   dispatch(setTTSStatus(TTS_STATUSES.speaking));
 
-  for (let i = paragraphIndex; i < strings.length; i++) {
+  for (let i = paragraphIndex; i < content.length; i++) {
+    if (content[i].image) break;
+
     const newBookmark = { chapter: currentChapterIndex, paragraph: i };
 
     dispatch(setCurrent(newBookmark));
     dispatch(
       setBookmark({
-        bookId: state.library.activeBook,
+        bookId: state.reader.bookId,
         bookmark: newBookmark,
       })
     );
 
-    await speak(strings[i].text, state.reader.options);
+    try {
+      await speak(content[i].text, state.reader.options);
+    } catch (error) {
+      console.log(error);
+    }
+
+    //get current state
+    state = getState();
 
     //check if Speaking was stopped from outside
-    if (getState().reader.status === TTS_STATUSES.paused) {
+    if (state.reader.status === TTS_STATUSES.paused) {
       return;
     }
   }
@@ -126,7 +145,7 @@ export const speakAll = (index) => async (dispatch, getState) => {
   //set bookmark to next chapter
   await dispatch(
     setBookmark({
-      bookId: state.library.activeBook,
+      bookId: state.reader.bookId,
       bookmark: { chapter: currentChapterIndex + 1, paragraph: 0 },
     })
   );
@@ -183,13 +202,16 @@ export const getChapter = () => async (dispatch, getState) => {
     return { error: true, message: 'Fail to open book file' };
   }
 
-  dispatch(setTotalChapters(bookFile.json.chapters.length));
-
-  const paragraphs = await parseChapterHtmlAsync(
-    bookFile.json.chapters[chapterIndex].content
+  dispatch(
+    setBook({ id: activeBookId, totalChapters: bookFile.json.chapters.length })
   );
 
-  dispatch(setCurrent({ ...book.bookmark, content: paragraphs }));
+  dispatch(
+    setCurrent({
+      ...book.bookmark,
+      content: bookFile.json.chapters[chapterIndex].content,
+    })
+  );
 };
 
 export default readerReducer;
