@@ -10,6 +10,7 @@ import Reader from './screens/Reader/Reader';
 import Settings from './screens/Settings/Settings';
 import { useSelector, useDispatch } from 'react-redux';
 import withAppBar from './components/hoc/withAppBar';
+import DrawerContent from './components/DrawerContent';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -66,7 +67,10 @@ export default function App() {
         }}
         ref={ref}
       >
-        <Drawer.Navigator initialRouteName='Library'>
+        <Drawer.Navigator
+          initialRouteName='Library'
+          drawerContent={DrawerContent}
+        >
           <Drawer.Screen name='Library' component={withAppBar(Library)} />
           {activeBook && (
             <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
