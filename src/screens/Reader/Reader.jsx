@@ -1,7 +1,18 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+  useMemo,
+} from 'react';
 import { View, StyleSheet, Image, FlatList, AppState } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { ActivityIndicator, Paragraph } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Paragraph,
+  Surface,
+  useTheme,
+} from 'react-native-paper';
 import NavButton from './NavButton';
 import {
   getChapter,
@@ -14,6 +25,8 @@ import {
 const Reader = () => {
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
+  const activeParagraphColor = useTheme().colors.activeParagraph;
+  const fontSize = useSelector((state) => state.reader.fontSize);
 
   const ttsStatus = useSelector((state) => state.reader.status);
   const isSpeaking = useRef();
@@ -90,13 +103,27 @@ const Reader = () => {
     }
   };
 
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1 },
+        content: { padding: 5 },
+        paragraph: { fontSize: fontSize, paddingVertical: 5 },
+      }),
+    [fontSize]
+  );
+
   const renderItem = useCallback(
     ({ item, index }) =>
       item.image ? (
         <Image source={item.image} />
       ) : (
         <Paragraph
-          style={current.paragraph === index ? styles.currentSpeaking : null}
+          style={
+            current.paragraph === index
+              ? { ...styles.paragraph, backgroundColor: activeParagraphColor }
+              : styles.paragraph
+          }
           onPress={() => handlePressParagraph(index)}
         >
           {item.text}
@@ -111,13 +138,16 @@ const Reader = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        ref={scrollRef}
-        data={current.content}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => 'p' + index}
-        onScrollToIndexFailed={handleScrollToIndexFailed}
-      />
+      <Surface>
+        <FlatList
+          ref={scrollRef}
+          data={current.content}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => 'p' + index}
+          onScrollToIndexFailed={handleScrollToIndexFailed}
+          contentContainerStyle={styles.content}
+        />
+      </Surface>
       {current.chapter > 0 && (
         <NavButton prev handlePress={() => handlePressNav(true)} />
       )}
@@ -127,11 +157,5 @@ const Reader = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: { padding: 10 },
-  currentSpeaking: { backgroundColor: 'lightblue' },
-});
 
 export default Reader;

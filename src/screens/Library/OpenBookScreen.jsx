@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Snackbar,
   useTheme,
+  Surface,
 } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { readDirectory, readBookFile } from './../../redux/filesReducer';
@@ -118,15 +119,28 @@ const OpenBookScreen = ({ navigation }) => {
     return renderSpinner;
   }
 
+  const renderItem = ({ item }) =>
+    item.isDirectory ? (
+      <List.Item
+        title={item.name}
+        left={(props) => <List.Icon {...props} icon='folder' />}
+        onPress={() =>
+          dispatch(readDirectory(`${directory.path}/${item.name}`, item.name))
+        }
+      />
+    ) : (
+      <List.Item title={item.name} onPress={() => handleOpenFile(item)} />
+    );
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Surface style={styles.header}>
         <Button icon='arrow-left' onPress={() => navigation.goBack()} />
         <Title>Open Book</Title>
-      </View>
+      </Surface>
       <Divider />
 
-      <View>
+      <Surface>
         <List.Accordion
           title={storage.name}
           left={(props) => <List.Icon {...props} icon='folder' />}
@@ -136,42 +150,27 @@ const OpenBookScreen = ({ navigation }) => {
           <List.Item title='Internal' />
           <List.Item title='External' />
         </List.Accordion>
-      </View>
+      </Surface>
       <Divider />
 
-      <View>
+      <Surface>
         <ScrollView contentContainerStyle={styles.pathChips} horizontal={true}>
           {pathChips}
         </ScrollView>
-      </View>
+      </Surface>
       <Divider />
 
-      {directory.isFetching ? (
-        renderSpinner
-      ) : (
-        <FlatList
-          data={directory.entries}
-          keyExtractor={(entry) => entry.name}
-          renderItem={({ item }) =>
-            item.isDirectory ? (
-              <List.Item
-                title={item.name}
-                left={(props) => <List.Icon {...props} icon='folder' />}
-                onPress={() =>
-                  dispatch(
-                    readDirectory(`${directory.path}/${item.name}`, item.name)
-                  )
-                }
-              />
-            ) : (
-              <List.Item
-                title={item.name}
-                onPress={() => handleOpenFile(item)}
-              />
-            )
-          }
-        />
-      )}
+      <Surface style={styles.container}>
+        {directory.isFetching ? (
+          renderSpinner
+        ) : (
+          <FlatList
+            data={directory.entries}
+            keyExtractor={(entry) => entry.name}
+            renderItem={renderItem}
+          />
+        )}
+      </Surface>
 
       <Snackbar
         visible={visible}

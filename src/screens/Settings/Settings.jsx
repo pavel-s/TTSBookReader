@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { RadioButton, Caption, Title } from 'react-native-paper';
+import { RadioButton, Caption, Title, Surface } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import Slider from '@react-native-community/slider';
 import { setTTSOptions } from '../../redux/readerReducer';
@@ -13,18 +13,20 @@ const Settings = () => {
     dispatch(setTTSOptions({ ...ttsOptions, [option]: Math.round10(val, -1) }));
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Title>TTS Options</Title>
+    <Surface style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Title>TTS Options</Title>
 
-      <ParamSlider
-        param={{ name: 'Rate', value: ttsOptions.rate }}
-        onComplete={(val) => setTTSOption('rate', val)}
-      />
-      <ParamSlider
-        param={{ name: 'Pitch', value: ttsOptions.pitch }}
-        onComplete={(val) => setTTSOption('pitch', val)}
-      />
-    </ScrollView>
+        <ParamSlider
+          param={{ name: 'Rate', value: ttsOptions.rate }}
+          onComplete={(val) => setTTSOption('rate', val)}
+        />
+        <ParamSlider
+          param={{ name: 'Pitch', value: ttsOptions.pitch }}
+          onComplete={(val) => setTTSOption('pitch', val)}
+        />
+      </ScrollView>
+    </Surface>
   );
 };
 
@@ -50,7 +52,8 @@ const ParamSlider = ({ param, min, max, onComplete }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1 },
+  scrollContainer: {
     padding: 10,
     alignItems: 'center',
   },

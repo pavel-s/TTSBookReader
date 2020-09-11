@@ -8,6 +8,7 @@ export const TTS_STATUSES = { speaking: 'speaking', paused: 'paused' };
 const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
 const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
+const SET_FONT_SIZE = 'TTSBookReader/readerReducer/SET_FONT_SIZE';
 
 //todo: add in progress state
 /**
@@ -35,6 +36,7 @@ const initialState = {
     rate: 2.6,
     language: 'en',
   },
+  fontSize: 16,
 };
 
 /**
@@ -61,6 +63,18 @@ const readerReducer = (state = initialState, { type, payload }) => {
         ...state,
         bookId: payload.id,
         totalChapters: payload.totalChapters,
+      };
+
+    case SET_FONT_SIZE:
+      const newSize =
+        typeof payload === 'number'
+          ? payload
+          : payload === 'increase'
+          ? state.fontSize + 1
+          : state.fontSize - 1;
+      return {
+        ...state,
+        fontSize: newSize,
       };
 
     default:
@@ -98,6 +112,12 @@ export const setBook = (payload) => ({
   type: SET_BOOK,
   payload,
 });
+
+/**
+ *
+ * @param {*} payload - font size Integer or 'increase'/'decrease' String
+ */
+export const setFontSize = (payload) => ({ type: SET_FONT_SIZE, payload });
 
 /**
  * Speak all chapters form current chapter and paragraph[index]

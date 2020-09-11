@@ -12,15 +12,57 @@ import { useSelector, useDispatch } from 'react-redux';
 import withAppBar from './components/hoc/withAppBar';
 import DrawerContent from './components/DrawerContent';
 
+import {
+  Provider as PaperProvider,
+  DefaultTheme as PaperDefaultTheme,
+  DarkTheme as PaperDarkTheme,
+} from 'react-native-paper';
+
+import { persistor } from './redux/store';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PersistGate } from 'redux-persist/integration/react';
+
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+} from '@react-navigation/native';
+import { toggleTheme } from './redux/appReducer';
+import { setFontSize } from './redux/readerReducer';
+
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
 const Drawer = createDrawerNavigator();
+
+const customDarkTheme = {
+  ...NavigationDarkTheme,
+  ...PaperDarkTheme,
+  colors: {
+    ...NavigationDarkTheme.colors,
+    ...PaperDarkTheme.colors,
+    activeParagraph: 'rgba(0, 0, 0, 0.5)',
+  },
+};
+
+const customDefaultTheme = {
+  ...NavigationDefaultTheme,
+  ...PaperDefaultTheme,
+  colors: {
+    ...NavigationDefaultTheme.colors,
+    ...PaperDefaultTheme.colors,
+    activeParagraph: 'lightblue',
+  },
+};
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState();
   const activeBook = useSelector((state) => state.library.activeBook);
   const ref = React.useRef(null);
+  const dispatch = useDispatch();
+
+  const isDarkTheme = useSelector((state) => state.app.isDarkTheme);
+  const theme = isDarkTheme ? customDarkTheme : customDefaultTheme;
+  const fontSize = useSelector((state) => state.reader.fontSize);
 
   useEffect(() => {
     // dispatch(initTTS());
@@ -59,26 +101,44 @@ export default function App() {
     );
   }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <NavigationContainer
-        initialState={initialState}
-        onStateChange={(state) => {
-          AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
-        }}
-        ref={ref}
-      >
-        <Drawer.Navigator
-          initialRouteName='Library'
-          drawerContent={DrawerContent}
-        >
-          <Drawer.Screen name='Library' component={withAppBar(Library)} />
-          {activeBook && (
-            <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
-          )}
-          <Drawer.Screen name='Settings' component={withAppBar(Settings)} />
-        </Drawer.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
+    <PersistGate loading={null} persistor={persistor}>
+      <PaperProvider theme={theme}>
+        <SafeAreaProvider>
+          <SafeAreaView style={{ flex: 1 }}>
+            <NavigationContainer
+              initialState={initialState}
+              onStateChange={(state) => {
+                AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
+              }}
+              ref={ref}
+              theme={theme}
+            >
+              <Drawer.Navigator
+                initialRouteName='Library'
+                drawerContent={(props) => (
+                  <DrawerContent
+                    props={props}
+                    isDarkTheme={isDarkTheme}
+                    toggleTheme={() => dispatch(toggleTheme())}
+                    fontSize={fontSize}
+                    setFontSize={(value) => dispatch(setFontSize(value))}
+                  />
+                )}
+              >
+                <Drawer.Screen name='Library' component={withAppBar(Library)} />
+                {activeBook && (
+                  <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
+                )}
+                <Drawer.Screen
+                  name='Settings'
+                  component={withAppBar(Settings)}
+                />
+              </Drawer.Navigator>
+            </NavigationContainer>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </PaperProvider>
+    </PersistGate>
   );
 }
 

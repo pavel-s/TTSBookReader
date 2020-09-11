@@ -23,7 +23,6 @@ const BooksScreen = React.memo(({ navigation, books }) => {
         onPress={() => navigation.navigate('Open Book')}
         style={styles.fab}
       />
-      <Button onPress={() => dispatch(clearLibrary())}>Clear Library</Button>
       <ScrollView style={styles.view}>
         {books.map((book) => (
           <Card key={book.id} style={styles.bookCard}>
@@ -44,6 +43,7 @@ const BooksScreen = React.memo(({ navigation, books }) => {
             </Card.Actions>
           </Card>
         ))}
+        <Button onPress={() => dispatch(clearLibrary())}>Clear Library</Button>
       </ScrollView>
     </View>
   );
