@@ -119,6 +119,8 @@ const OpenBookScreen = ({ navigation }) => {
     return renderSpinner;
   }
 
+  const entries = sortEntries(directory.entries);
+
   const renderItem = ({ item }) =>
     item.isDirectory ? (
       <List.Item
@@ -165,7 +167,7 @@ const OpenBookScreen = ({ navigation }) => {
           renderSpinner
         ) : (
           <FlatList
-            data={directory.entries}
+            data={entries}
             keyExtractor={(entry) => entry.name}
             renderItem={renderItem}
           />
@@ -193,5 +195,15 @@ const styles = StyleSheet.create({
   },
   snackbar: { position: 'absolute', bottom: 0 },
 });
+
+const sortEntries = (entries) => {
+  const directories = entries.filter((entry) => entry.isDirectory);
+  const files = entries.filter((entry) => !entry.isDirectory);
+
+  directories.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+  files.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+
+  return [...directories, ...files];
+};
 
 export default OpenBookScreen;
