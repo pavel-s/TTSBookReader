@@ -1,6 +1,15 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { FAB, Button, List, Card, Title, Paragraph } from 'react-native-paper';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import {
+  FAB,
+  Button,
+  List,
+  Card,
+  Title,
+  Paragraph,
+  Surface,
+  Subheading,
+} from 'react-native-paper';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { enableScreens } from 'react-native-screens';
 import OpenBookScreen from './OpenBookScreen';
@@ -25,25 +34,45 @@ const BooksScreen = React.memo(({ navigation, books }) => {
       />
       <ScrollView style={styles.view}>
         {books.map((book) => (
-          <Card key={book.id} style={styles.bookCard}>
-            <Card.Cover source={{ uri: book.image }} />
-            <Card.Content>
-              <Title>{book.title}</Title>
-              <Paragraph>{book.description}</Paragraph>
-            </Card.Content>
-            <Card.Actions>
-              <Button
-                onPress={async () => {
-                  await dispatch(setActiveBook(book.id));
-                  navigation.navigate('Reader');
-                }}
-              >
-                Read
-              </Button>
-            </Card.Actions>
-          </Card>
+          <Surface key={book.id} style={styles.bookCard} elevation={3}>
+            <Image source={{ uri: book.image }} style={styles.cardImage} />
+            <View style={styles.cardRight}>
+              <View style={styles.cardContent}>
+                <Title style={styles.cardTitle} numberOfLines={2}>
+                  {book.title}
+                </Title>
+                <Paragraph style={styles.cardDescription} numberOfLines={2}>
+                  {book.description}
+                </Paragraph>
+              </View>
+
+              <Card.Actions style={styles.cardActions}>
+                <Button
+                  onPress={async () => {
+                    await dispatch(setActiveBook(book.id));
+                    navigation.navigate('Reader');
+                  }}
+                >
+                  Read
+                </Button>
+                <Button
+                  onPress={async () => {
+                    // await dispatch(setActiveBook(book.id));
+                    // navigation.navigate('Reader');
+                  }}
+                >
+                  More
+                </Button>
+              </Card.Actions>
+            </View>
+          </Surface>
         ))}
-        <Button onPress={() => dispatch(clearLibrary())}>Clear Library</Button>
+        <Button
+          onPress={() => dispatch(clearLibrary())}
+          style={styles.clearButton}
+        >
+          Clear Library
+        </Button>
       </ScrollView>
     </View>
   );
@@ -76,8 +105,35 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   bookCard: {
-    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    margin: 5,
   },
+  cardImage: {
+    width: 100,
+    height: 100,
+  },
+  cardRight: {
+    flex: 1,
+  },
+  cardContent: {
+    paddingLeft: 10,
+  },
+  cardTitle: {
+    marginVertical: 0,
+    marginTop: 5,
+    lineHeight: 24,
+    minHeight: 24,
+  },
+  cardDescription: {
+    marginVertical: 0,
+    fontSize: 13,
+  },
+  cardActions: {
+    justifyContent: 'space-between',
+  },
+  clearButton: { marginTop: 40 },
 });
 
 export default Library;
