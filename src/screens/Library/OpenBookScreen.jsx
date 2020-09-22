@@ -18,6 +18,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { readDirectory, readBookFile } from './../../redux/filesReducer';
 import { parseFilePath } from './../../utils/common';
 import { addBook } from './../../redux/libraryReducer';
+import withAppBar from './../../components/hoc/withAppBar';
 
 const OpenBookScreen = ({ navigation }) => {
   const libraryBooks = useSelector((state) => state.library.books);
@@ -136,12 +137,6 @@ const OpenBookScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Surface style={styles.header}>
-        <Button icon='arrow-left' onPress={() => navigation.goBack()} />
-        <Title>Open Book</Title>
-      </Surface>
-      <Divider />
-
       <Surface>
         <List.Accordion
           title={storage.name}
@@ -206,4 +201,4 @@ const sortEntries = (entries) => {
   return [...directories, ...files];
 };
 
-export default OpenBookScreen;
+export default withAppBar(OpenBookScreen);

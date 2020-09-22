@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableHighlight } from 'react-native';
 import { DrawerActions } from '@react-navigation/native';
-import { Appbar, TextInput, Title, List, Surface } from 'react-native-paper';
+import {
+  Appbar,
+  TextInput,
+  Title,
+  List,
+  Surface,
+  Button,
+} from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBookmark } from '../redux/libraryReducer';
 import { TTS_STATUSES, stopSpeaking, speakAll } from './../redux/readerReducer';
@@ -54,8 +61,8 @@ const AppBar = ({ route, navigation }) => {
             navigation.dispatch(DrawerActions.toggleDrawer());
           }}
         />
-        <View style={styles.row}>
-          {route === 'Reader' && book && bookFile.wasRead && (
+        {route === 'Reader' && book && bookFile.wasRead && (
+          <View style={styles.row}>
             <TouchableHighlight
               underlayColor={'rgba(0,0,0,0.1)'}
               style={styles.row}
@@ -68,8 +75,18 @@ const AppBar = ({ route, navigation }) => {
                 <List.Icon icon={showBookNav ? 'chevron-up' : 'chevron-down'} />
               </View>
             </TouchableHighlight>
-          )}
-        </View>
+          </View>
+        )}
+        {route !== 'Reader' && route !== 'Settings' && (
+          <View style={styles.routeHeader}>
+            <View style={styles.row}>
+              {route !== 'Books' && (
+                <Appbar.BackAction onPress={() => navigation.goBack()} />
+              )}
+              <Appbar.Content title={route} />
+            </View>
+          </View>
+        )}
         <Appbar.Action
           icon={ttsStatus === TTS_STATUSES.speaking ? 'pause' : 'play'}
           onPress={
@@ -102,6 +119,9 @@ const styles = StyleSheet.create({
   },
   title: { marginLeft: 10 },
   bookNav: { alignItems: 'center' },
+  routeHeader: {
+    flexGrow: 1,
+  },
   input: {
     width: 120,
     backgroundColor: 'rgba(0,0,0,0.2)',

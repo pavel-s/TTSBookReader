@@ -36,7 +36,7 @@ const initialState = {
     rate: 2.6,
     language: 'en',
   },
-  fontSize: 16,
+  fontSize: 15,
 };
 
 /**
