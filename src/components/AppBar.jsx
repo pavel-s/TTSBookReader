@@ -26,16 +26,11 @@ const AppBar = ({ route, navigation }) => {
     book.bookmark.chapter,
   ]);
 
-  let chapters;
-  if (book && bookFile.wasRead) {
-    chapters = bookFile.json.chapters;
-  }
-
   const handleGoChapter = (value) => {
     let number = +value;
 
     if (number > 0) {
-      if (number < chapters.length) {
+      if (number < book.chaptersList.length) {
         dispatch(goToChapter(number - 1));
         setInputValue(value);
       }
