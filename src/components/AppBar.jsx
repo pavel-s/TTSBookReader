@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { DrawerActions } from '@react-navigation/native';
-import { Appbar, TextInput, Title, List, Surface } from 'react-native-paper';
+import {
+  Appbar,
+  TextInput,
+  Title,
+  List,
+  Surface,
+  useTheme,
+} from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { TTS_STATUSES, stopSpeaking, speakAll } from './../redux/readerReducer';
 import { goToChapter } from './../redux/readerReducer';
@@ -9,6 +16,7 @@ import { goToChapter } from './../redux/readerReducer';
 const AppBar = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const ttsStatus = useSelector((state) => state.reader.status);
+  const theme = useTheme();
 
   const [showBookNav, setShowBookNav] = useState(false);
 
@@ -23,7 +31,6 @@ const AppBar = ({ route, navigation }) => {
   );
   useEffect(() => setInputValue(book && String(book.bookmark.chapter + 1)), [
     book,
-    book.bookmark.chapter,
   ]);
 
   const handleGoChapter = (value) => {
@@ -55,7 +62,10 @@ const AppBar = ({ route, navigation }) => {
             onPress={() => setShowBookNav(!showBookNav)}
           >
             <View style={styles.chapterHeader}>
-              <Title style={styles.title} numberOfLines={2}>
+              <Title
+                style={[styles.title, { color: theme.colors.onPrimary }]}
+                numberOfLines={2}
+              >
                 {book.chaptersList[book.bookmark.chapter]}
               </Title>
               <List.Icon
