@@ -28,6 +28,7 @@ import {
 } from '@react-navigation/native';
 import { toggleTheme } from './redux/appReducer';
 import { setFontSize } from './redux/readerReducer';
+import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -105,6 +106,10 @@ export default function App() {
       <PaperProvider theme={theme}>
         <SafeAreaProvider>
           <SafeAreaView style={{ flex: 1 }}>
+            <ExpoStatusBar
+              style={isDarkTheme ? 'light' : 'dark'}
+              backgroundColor={theme.colors.background}
+            />
             <NavigationContainer
               initialState={initialState}
               onStateChange={(state) => {
