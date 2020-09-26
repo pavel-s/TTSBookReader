@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { DrawerActions } from '@react-navigation/native';
-import {
-  Appbar,
-  TextInput,
-  Title,
-  List,
-  Surface,
-  Button,
-} from 'react-native-paper';
+import { Appbar, TextInput, Title, List, Surface } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { setBookmark } from '../redux/libraryReducer';
 import { TTS_STATUSES, stopSpeaking, speakAll } from './../redux/readerReducer';
 import { goToChapter } from './../redux/readerReducer';
 
@@ -29,10 +21,10 @@ const AppBar = ({ route, navigation }) => {
   const [inputValue, setInputValue] = useState(
     book && String(book.bookmark.chapter + 1)
   );
-  useEffect(
-    () => setInputValue(book && String(book.bookmark.chapter + 1), [book]),
-    []
-  );
+  useEffect(() => setInputValue(book && String(book.bookmark.chapter + 1)), [
+    book,
+    book.bookmark.chapter,
+  ]);
 
   let chapters;
   if (book && bookFile.wasRead) {
@@ -54,7 +46,7 @@ const AppBar = ({ route, navigation }) => {
 
   return (
     <>
-      <Appbar style={{ justifyContent: 'space-between' }}>
+      <Appbar>
         <Appbar.Action
           icon='menu'
           onPress={() => {
@@ -62,20 +54,21 @@ const AppBar = ({ route, navigation }) => {
           }}
         />
         {route === 'Reader' && book && bookFile.wasRead && (
-          <View style={styles.row}>
-            <TouchableHighlight
-              underlayColor={'rgba(0,0,0,0.1)'}
-              style={styles.row}
-              onPress={() => setShowBookNav(!showBookNav)}
-            >
-              <View style={styles.row}>
-                <Title style={styles.title}>
-                  Chapter {book.bookmark.chapter + 1}
-                </Title>
-                <List.Icon icon={showBookNav ? 'chevron-up' : 'chevron-down'} />
-              </View>
-            </TouchableHighlight>
-          </View>
+          <TouchableHighlight
+            underlayColor={'rgba(0,0,0,0.1)'}
+            style={{ flex: 1 }}
+            onPress={() => setShowBookNav(!showBookNav)}
+          >
+            <View style={styles.chapterHeader}>
+              <Title style={styles.title} numberOfLines={2}>
+                {book.chaptersList[book.bookmark.chapter]}
+              </Title>
+              <List.Icon
+                icon={showBookNav ? 'chevron-up' : 'chevron-down'}
+                style={styles.chapterHeaderMore}
+              />
+            </View>
+          </TouchableHighlight>
         )}
         {route !== 'Reader' && route !== 'Settings' && (
           <View style={styles.routeHeader}>
@@ -88,6 +81,7 @@ const AppBar = ({ route, navigation }) => {
           </View>
         )}
         <Appbar.Action
+          style={{ marginLeft: 'auto' }}
           icon={ttsStatus === TTS_STATUSES.speaking ? 'pause' : 'play'}
           onPress={
             ttsStatus === TTS_STATUSES.speaking
@@ -117,7 +111,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  title: { marginLeft: 10 },
+  chapterHeader: {
+    flex: 1,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chapterHeaderMore: {
+    position: 'absolute',
+    width: '100%',
+    bottom: -21,
+    opacity: 0.5,
+  },
+  title: { marginLeft: 10, fontSize: 18, lineHeight: 20 },
   bookNav: { alignItems: 'center' },
   routeHeader: {
     flexGrow: 1,

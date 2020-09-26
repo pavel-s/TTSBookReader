@@ -97,6 +97,9 @@ const OpenBookScreen = ({ navigation }) => {
             image: result.book.image || null,
             createAt: Date.now(),
             bookmark: null,
+            chaptersList: Object.values(result.book.chapters).map(
+              (chapter) => chapter.title
+            ),
             file: {
               name: entry.name,
               path: `${directory.path}/${entry.name}`,
