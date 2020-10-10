@@ -10,8 +10,12 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { TTS_STATUSES, stopSpeaking, speakAll } from './../redux/readerReducer';
-import { goToChapter } from './../redux/readerReducer';
+import {
+  TTS_STATUSES,
+  stopSpeaking,
+  speakAll,
+  goToChapter,
+} from '../redux/readerReducer';
 
 const AppBar = ({ route, navigation }) => {
   const dispatch = useDispatch();

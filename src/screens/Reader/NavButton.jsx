@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { toggleSpeaking } from '../../redux/readerReducer';
 import {
   StyleSheet,
   TouchableHighlight,

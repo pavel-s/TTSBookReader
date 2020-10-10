@@ -40,7 +40,7 @@ const customDarkTheme = {
   colors: {
     ...NavigationDarkTheme.colors,
     ...PaperDarkTheme.colors,
-    activeParagraph: 'rgba(0, 0, 0, 0.5)',
+    activeParagraph: 'darkblue',
     onPrimary: 'rgba(255, 255, 255, 0.87)',
   },
 };
