@@ -103,9 +103,11 @@ const Reader = () => {
       const chapterIndex = Math.floor(
         contentOffset.x / layoutMeasurement.width
       );
-      dispatch(goToChapter(chapterIndex));
+      if (chapterIndex !== current.chapter) {
+        dispatch(goToChapter(chapterIndex));
+      }
     },
-    []
+    [current.chapter]
   );
 
   if (!bookContent || !bookContent.length) {
