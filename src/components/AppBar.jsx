@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { DrawerActions } from '@react-navigation/native';
 import {
@@ -37,32 +37,34 @@ const AppBar = ({ route, navigation }) => {
     book,
   ]);
 
-  const handleGoChapter = (value) => {
-    let number = +value;
+  const handleGoChapter = useCallback(
+    (value) => {
+      let number = +value;
 
-    if (number > 0) {
-      if (number < book.chaptersList.length) {
-        dispatch(goToChapter(number - 1));
-        setInputValue(value);
+      if (number > 0) {
+        if (number < book.chaptersList.length) {
+          dispatch(goToChapter(number - 1));
+          setInputValue(value);
+        }
+      } else {
+        setInputValue('');
       }
-    } else {
-      setInputValue('');
-    }
-  };
+    },
+    [book]
+  );
+
+  const handlePressMenu = useCallback(() => {
+    navigation.dispatch(DrawerActions.toggleDrawer());
+  }, []);
 
   return (
     <>
       <Appbar>
-        <Appbar.Action
-          icon='menu'
-          onPress={() => {
-            navigation.dispatch(DrawerActions.toggleDrawer());
-          }}
-        />
+        <Appbar.Action icon='menu' onPress={handlePressMenu} />
         {route === 'Reader' && book && bookFile.wasRead && (
           <TouchableHighlight
             underlayColor={'rgba(0,0,0,0.1)'}
-            style={{ flex: 1 }}
+            style={styles.flex1}
             onPress={() => setShowBookNav(!showBookNav)}
           >
             <View style={styles.chapterHeader}>
@@ -116,6 +118,7 @@ const AppBar = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
