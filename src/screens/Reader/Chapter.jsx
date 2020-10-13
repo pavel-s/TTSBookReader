@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, Image, FlatList, Dimensions, Text } from 'react-native';
+import { StyleSheet, Image, FlatList, Text } from 'react-native';
 import defaultImage from '../../../assets/default_image.png';
 
 class ChapterParagraph extends React.PureComponent {
@@ -42,7 +42,7 @@ const Chapter = ({
 
   //scroll to active paragraph
   const scrollToCurrentParagraph = () => {
-    if (current && scrollRef.current && appState.current === 'active') {
+    if (current && scrollRef.current && appState === 'active') {
       setTimeout(() => {
         scrollRef.current.scrollToIndex({
           animate: false,
@@ -51,7 +51,7 @@ const Chapter = ({
       }, 50);
     }
   };
-  useEffect(scrollToCurrentParagraph, [currentParagraph, appState.current]);
+  useEffect(scrollToCurrentParagraph, [currentParagraph, appState]);
 
   const handleScrollToIndexFailed = useCallback(
     ({ index, highestMeasuredFrameIndex }) => {

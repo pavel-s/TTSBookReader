@@ -31,11 +31,9 @@ const Reader = () => {
   const current = useSelector((state) => state.reader.current);
   const bookContent = useSelector((state) => state.reader.content);
 
-  // is App 'active' or 'background' //todo: try ref instead
-  // const [appState, setAppState] = useState(AppState.currentState);
-  const appState = useRef(AppState.currentState);
+  const [appState, setAppState] = useState(AppState.currentState);
   useEffect(() => {
-    const listener = (state) => (appState.current = state);
+    const listener = (state) => setAppState(state);
     AppState.addEventListener('change', listener);
     return () => AppState.removeEventListener('change', listener);
   }, []);
@@ -85,14 +83,15 @@ const Reader = () => {
   }, []);
 
   const renderChapter = ({ item: chapter, index }) => {
+    const isCurrent = current.chapter === index;
     return (
       <Chapter
         chapter={chapter}
-        appState={appState}
+        appState={isCurrent && appState}
         fontSize={fontSize}
         chapterIndex={index}
         handlePressParagraph={handlePressParagraph}
-        current={current.chapter === index ? current : false}
+        current={isCurrent && current}
         chapterStyles={chapterStyles}
       />
     );
