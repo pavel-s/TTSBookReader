@@ -149,7 +149,7 @@ export const speakAll = (index) => async (dispatch, getState) => {
     //from current paragraph to end of chapter
     const content = state.reader.content[k];
     for (let i = paragraphIndex; i < content.length; i++) {
-      if (content[i].image) break;
+      if (content[i].image) continue;
 
       const newBookmark = { chapter: k, paragraph: i };
 
