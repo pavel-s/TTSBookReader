@@ -109,6 +109,10 @@ const Reader = () => {
     [current.chapter]
   );
 
+  if (appState !== 'active') {
+    return null;
+  }
+
   if (!bookContent || !bookContent.length) {
     return <ActivityIndicator style={{ flex: 1 }} />;
   }
