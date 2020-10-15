@@ -27,8 +27,10 @@ import {
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import { toggleTheme } from './redux/appReducer';
-import { setFontSize } from './redux/readerReducer';
+import { setFontSize, stopSpeaking } from './redux/readerReducer';
 import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
+import CallDetectorManager from 'react-native-call-detection';
+import * as Speech from 'expo-speech';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -95,6 +97,24 @@ export default function App() {
       restoreState();
     }
   }, [isReady]);
+
+  // stop/resume speaking on phone call
+  useEffect(() => {
+    const callDetector = new CallDetectorManager((event) => {
+      if (event === 'Disconnected' || event === 'Missed') {
+        // resume
+      } else if (
+        event === 'Connected' ||
+        event === 'Incoming' ||
+        event === 'Dialing' ||
+        event === 'Offhook'
+      ) {
+        dispatch(stopSpeaking());
+      }
+    }, false);
+
+    return () => callDetector.dispose();
+  }, []);
 
   if (!isReady) {
     return (

@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ttsbookreader">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.ttsbookreader">
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -28,6 +28,7 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:allowBackup="true"
     android:theme="@style/AppTheme"
+    tools:replace="android:allowBackup"
   >
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://exp.host/@dil333/TTSBookReader"/>
     <meta-data android:name="expo.modules.updates.EXPO_SDK_VERSION" android:value="39.0.0"/>
