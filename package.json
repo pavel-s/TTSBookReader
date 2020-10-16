@@ -27,6 +27,7 @@
     "react-native-call-detection": "github:priteshrnandgaonkar/react-native-call-detection.git#d6e90c32188341b36508853eb743b9a475acdd5a",
     "react-native-console-time-polyfill": "^1.2.1",
     "react-native-gesture-handler": "~1.7.0",
+    "react-native-keyevent": "^0.2.8",
     "react-native-paper": "^4.2.0",
     "react-native-reanimated": "~1.13.0",
     "react-native-safe-area-context": "3.1.4",

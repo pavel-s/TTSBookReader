@@ -30,7 +30,7 @@ import { toggleTheme } from './redux/appReducer';
 import { setFontSize, stopSpeaking } from './redux/readerReducer';
 import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 import CallDetectorManager from 'react-native-call-detection';
-import * as Speech from 'expo-speech';
+import KeyEvent from 'react-native-keyevent';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -113,7 +113,16 @@ export default function App() {
       }
     }, false);
 
-    return () => callDetector.dispose();
+    // KeyEvent.onKeyDownListener((keyEvent) => {
+    //   console.log(`onKeyDown keyCode: ${keyEvent.keyCode}`);
+    //   console.log(`Action: ${keyEvent.action}`);
+    //   console.log(`Key: ${keyEvent.pressedKey}`);
+    // });
+
+    return () => {
+      callDetector.dispose();
+      // KeyEvent.removeKeyDownListener();
+    };
   }, []);
 
   if (!isReady) {
