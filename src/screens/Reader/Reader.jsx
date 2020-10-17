@@ -71,11 +71,12 @@ const Reader = () => {
   //horizontal scroll to current chapter cell of FlatList
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
-    chaptersScrollRef.current &&
+    if (chaptersScrollRef.current && appState === 'active') {
       chaptersScrollRef.current.scrollToIndex({
         animate: false,
         index: current.chapter,
       });
+    }
   }, [current.chapter]);
 
   const handlePressParagraph = useCallback((index) => {
