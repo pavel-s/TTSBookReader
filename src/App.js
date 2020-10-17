@@ -28,7 +28,6 @@ import {
 } from '@react-navigation/native';
 import { toggleTheme } from './redux/appReducer';
 import { setFontSize, stopSpeaking } from './redux/readerReducer';
-import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 import CallDetectorManager from 'react-native-call-detection';
 import KeyEvent from 'react-native-keyevent';
 
@@ -125,6 +124,9 @@ export default function App() {
     };
   }, []);
 
+  const handleToggleTheme = () => dispatch(toggleTheme());
+  const handleSetFontSize = (value) => dispatch(setFontSize(value));
+
   if (!isReady) {
     return (
       <View style={styles.spinner}>
@@ -132,20 +134,19 @@ export default function App() {
       </View>
     );
   }
+
   return (
     <PersistGate loading={null} persistor={persistor}>
       <PaperProvider theme={theme}>
         <SafeAreaProvider>
-          <SafeAreaView style={{ flex: 1 }}>
-            <ExpoStatusBar
+          <SafeAreaView style={styles.container}>
+            <StatusBar
               style={isDarkTheme ? 'light' : 'dark'}
               backgroundColor={theme.colors.background}
             />
             <NavigationContainer
               initialState={initialState}
-              onStateChange={(state) => {
-                AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
-              }}
+              onStateChange={saveNavState}
               ref={ref}
               theme={theme}
             >
@@ -155,9 +156,9 @@ export default function App() {
                   <DrawerContent
                     props={props}
                     isDarkTheme={isDarkTheme}
-                    toggleTheme={() => dispatch(toggleTheme())}
+                    toggleTheme={handleToggleTheme}
                     fontSize={fontSize}
-                    setFontSize={(value) => dispatch(setFontSize(value))}
+                    setFontSize={handleSetFontSize}
                   />
                 )}
               >
@@ -182,3 +183,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   spinner: { flex: 1, justifyContent: 'center' },
 });
+
+const saveNavState = (state) => {
+  AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
+};
