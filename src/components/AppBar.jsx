@@ -12,9 +12,8 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import {
   TTS_STATUSES,
-  stopSpeaking,
-  speakAll,
   goToChapter,
+  toggleSpeaking,
 } from '../redux/readerReducer';
 
 const AppBar = ({ route, navigation }) => {
@@ -57,6 +56,10 @@ const AppBar = ({ route, navigation }) => {
     navigation.dispatch(DrawerActions.toggleDrawer());
   }, []);
 
+  const handleToggleSpeaking = useCallback((index) => {
+    dispatch(toggleSpeaking(index));
+  }, []);
+
   return (
     <>
       <Appbar>
@@ -92,13 +95,9 @@ const AppBar = ({ route, navigation }) => {
           </View>
         )}
         <Appbar.Action
-          style={{ marginLeft: 'auto' }}
+          style={styles.toggleSpeakingBtn}
           icon={ttsStatus === TTS_STATUSES.speaking ? 'pause' : 'play'}
-          onPress={
-            ttsStatus === TTS_STATUSES.speaking
-              ? () => dispatch(stopSpeaking())
-              : () => dispatch(speakAll())
-          }
+          onPress={handleToggleSpeaking}
         />
       </Appbar>
       {showBookNav && (
@@ -147,6 +146,8 @@ const styles = StyleSheet.create({
     margin: 5,
     marginLeft: 10,
   },
+  toggleSpeakingBtn: { marginLeft: 'auto' },
 });
 
 export default AppBar;
+// export default <View>123</View>;
