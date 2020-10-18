@@ -10,23 +10,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import {
   getBook,
-  TTS_STATUSES,
   goToChapter,
   toggleSpeaking,
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const Reader = () => {
   const dispatch = useDispatch();
 
   const fontSize = useSelector((state) => state.reader.fontSize);
-
-  const ttsStatus = useSelector((state) => state.reader.status);
-  const isSpeaking = useRef();
-  isSpeaking.current = ttsStatus === TTS_STATUSES.speaking;
 
   const current = useSelector((state) => state.reader.current);
   const bookContent = useSelector((state) => state.reader.content);
