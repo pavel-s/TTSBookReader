@@ -6,7 +6,8 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "publish": "expo publish",
-    "build:android": "expo build:android"
+    "build:android": "expo build:android",
+    "build android prod": "react-native run-android --variant=release"
   },
   "dependencies": {
     "@react-native-community/async-storage": "~1.12.0",
