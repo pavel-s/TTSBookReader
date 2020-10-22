@@ -48,7 +48,7 @@ const Reader = () => {
     () =>
       StyleSheet.create({
         container: { flex: 1 },
-        content: { padding: 5, width: width },
+        content: { padding: 5, width },
         paragraph: {
           color: onSurface,
           fontSize: fontSize,
@@ -95,7 +95,7 @@ const Reader = () => {
 
   const setCurrentChapter = useCallback(
     ({ nativeEvent: { contentOffset, layoutMeasurement } }) => {
-      const chapterIndex = Math.floor(
+      const chapterIndex = Math.round(
         contentOffset.x / layoutMeasurement.width
       );
       if (chapterIndex !== current.chapter) {
@@ -121,15 +121,17 @@ const Reader = () => {
           horizontal
           pagingEnabled
           getItemLayout={getItemLayout}
-          maxToRenderPerBatch={3}
+          maxToRenderPerBatch={1}
           updateCellsBatchingPeriod={100}
+          windowSize={5}
+          initialNumToRender={5}
           initialScrollIndex={current.chapter}
-          initialNumToRender={3}
           removeClippedSubviews
           keyExtractor={keyExtractor}
           renderItem={renderChapter}
           ref={chaptersScrollRef}
           onMomentumScrollEnd={setCurrentChapter}
+          scrollEventThrottle={32}
         />
       </Surface>
     </View>

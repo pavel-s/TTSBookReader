@@ -97,6 +97,11 @@ const Chapter = ({
       onScrollToIndexFailed={handleScrollToIndexFailed}
       contentContainerStyle={chapterStyles.content}
       extraData={currentParagraph}
+      scrollEventThrottle={32}
+      maxToRenderPerBatch={3}
+      updateCellsBatchingPeriod={80}
+      windowSize={20}
+      initialNumToRender={10}
     />
   );
 };
