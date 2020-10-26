@@ -29,6 +29,7 @@
     android:allowBackup="true"
     android:theme="@style/AppTheme"
     tools:replace="android:allowBackup"
+    android:requestLegacyExternalStorage="true"
   >
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://exp.host/@dil333/TTSBookReader" />
     <meta-data android:name="expo.modules.updates.EXPO_SDK_VERSION" android:value="39.0.0" />
