@@ -30,6 +30,9 @@ const BookInfo = ({ route }) => {
         {book.bookmark && (
           <Caption>Bookmark: chapter {book.bookmark.chapter}</Caption>
         )}
+        {book.chaptersList && (
+          <Caption>Length: {book.chaptersList.length} chapters</Caption>
+        )}
 
         <Subheading>Description: </Subheading>
         <Paragraph>{book.description}</Paragraph>
