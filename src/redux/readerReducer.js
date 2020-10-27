@@ -234,7 +234,7 @@ export const getBook = () => async (dispatch, getState) => {
     setBook({
       id: activeBookId,
       totalChapters: bookFile.json.chapters.length,
-      content: Object.values(bookFile.json.chapters).map(
+      content: Array.from(bookFile.json.chapters).map(
         (chapter) => chapter.content
       ),
     })
