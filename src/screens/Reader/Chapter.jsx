@@ -43,12 +43,10 @@ const Chapter = ({
   //scroll to active paragraph
   const scrollToCurrentParagraph = () => {
     if (current && scrollRef.current && appState === 'active') {
-      setTimeout(() => {
-        scrollRef.current.scrollToIndex({
-          animate: false,
-          index: currentParagraph,
-        });
-      }, 50);
+      scrollRef.current.scrollToIndex({
+        animate: false,
+        index: currentParagraph,
+      });
     }
   };
   useEffect(scrollToCurrentParagraph, [currentParagraph, appState]);
