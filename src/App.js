@@ -26,10 +26,11 @@ import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
-import { toggleTheme } from './redux/appReducer';
-import { setFontSize, stopSpeaking } from './redux/readerReducer';
+import { stopSpeaking } from './redux/readerReducer';
 import CallDetectorManager from 'react-native-call-detection';
 import KeyEvent from 'react-native-keyevent';
+import { setFontSize, toggleTheme } from './redux/settingsReducer';
+import { initializeApp } from './redux/appReducer';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -64,12 +65,11 @@ export default function App() {
   const ref = React.useRef(null);
   const dispatch = useDispatch();
 
-  const isDarkTheme = useSelector((state) => state.app.isDarkTheme);
+  const isDarkTheme = useSelector((state) => state.settings.isDarkTheme);
   const theme = isDarkTheme ? customDarkTheme : customDefaultTheme;
-  const fontSize = useSelector((state) => state.reader.fontSize);
+  const fontSize = useSelector((state) => state.settings.fontSize);
 
   useEffect(() => {
-    // dispatch(initTTS());
     /**
      * Restore navigation state from AsyncStorage
      */
@@ -94,6 +94,7 @@ export default function App() {
 
     if (!isReady) {
       restoreState();
+      dispatch(initializeApp());
     }
   }, [isReady]);
 
@@ -166,10 +167,7 @@ export default function App() {
                 {activeBook && (
                   <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
                 )}
-                <Drawer.Screen
-                  name='Settings'
-                  component={withAppBar(Settings)}
-                />
+                <Drawer.Screen name='Settings' component={Settings} />
               </Drawer.Navigator>
             </NavigationContainer>
           </SafeAreaView>

@@ -21,7 +21,7 @@ const { width } = Dimensions.get('window');
 const Reader = () => {
   const dispatch = useDispatch();
 
-  const fontSize = useSelector((state) => state.reader.fontSize);
+  const fontSize = useSelector((state) => state.settings.fontSize);
 
   const current = useSelector((state) => state.reader.current);
   const bookContent = useSelector((state) => state.reader.content);

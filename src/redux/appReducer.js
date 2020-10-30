@@ -1,17 +1,19 @@
 const INIT_APP_SUCCESS = 'TTSBookReader/appReducer/INIT_APP_SUCCESS';
-const TOGGLE_THEME = 'TTSBookReader/appReducer/TOGGLE_THEME';
-import { getLibrary } from './libraryReducer';
+const SET_TTS_VOICES = 'TTSBookReader/appReducer/SET_TTS_VOICES';
+
+import { getVoices } from '../api/tts';
+import { setTTSOption } from './settingsReducer';
 
 const appReducer = (
-  state = { initialized: false, isDarkTheme: true },
-  action
+  state = { initialized: false, other: { ttsVoices: [] } },
+  { type, payload }
 ) => {
-  switch (action.type) {
+  switch (type) {
     case INIT_APP_SUCCESS:
       return { ...state, initialized: true };
 
-    case TOGGLE_THEME:
-      return { ...state, isDarkTheme: !state.isDarkTheme };
+    case SET_TTS_VOICES:
+      return { ...state, other: { ...state.other, ttsVoices: payload } };
 
     default:
       return state;
@@ -20,11 +22,30 @@ const appReducer = (
 
 const initializeSuccess = () => ({ type: INIT_APP_SUCCESS });
 
+/**
+ * initialize success in any case for now
+ */
 export const initializeApp = () => async (dispatch) => {
-  // await dispatch(getLibrary());
+  dispatch(initializeTTS());
   dispatch(initializeSuccess());
 };
 
-export const toggleTheme = () => ({ type: TOGGLE_THEME });
+/**
+ * get and save available tts voices, verify state.settings.tts.voice
+ */
+const initializeTTS = () => async (dispatch, getState) => {
+  const currentTTSVoice = getState().settings.tts.voice;
+  const voices = await getVoices();
+  dispatch(setTTSVoices(voices)); // save array in state.app.other
+
+  if (
+    currentTTSVoice &&
+    !voices.some((voice) => voice.identifier === currentTTSVoice)
+  ) {
+    dispatch(setTTSOption({ option: 'voice', value: null })); // reset voice when he is not exist for some reason
+  }
+};
+
+export const setTTSVoices = (payload) => ({ type: SET_TTS_VOICES, payload });
 
 export default appReducer;

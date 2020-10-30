@@ -6,11 +6,12 @@ import appReducer from './appReducer';
 import filesReducer from './filesReducer';
 import libraryReducer from './libraryReducer';
 import readerReducer from './readerReducer';
+import settingsReducer from './settingsReducer';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['library'],
+  whitelist: ['library', 'settings'],
 };
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   files: filesReducer,
   library: libraryReducer,
   reader: readerReducer,
+  settings: settingsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

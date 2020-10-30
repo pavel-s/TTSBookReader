@@ -17,6 +17,7 @@ import {
 } from '../redux/readerReducer';
 
 const AppBar = ({ route, navigation }) => {
+  console.log('render Appbar', route);
   const dispatch = useDispatch();
   const ttsStatus = useSelector((state) => state.reader.status);
   const theme = useTheme();
@@ -84,11 +85,14 @@ const AppBar = ({ route, navigation }) => {
             </View>
           </TouchableHighlight>
         )}
-        {route !== 'Reader' && route !== 'Settings' && (
+        {route !== 'Reader' && (
           <View style={styles.routeHeader}>
             <View style={styles.row}>
-              {route !== 'Books' && (
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
+              {route !== 'Books' && route !== 'Settings' && (
+                <Appbar.BackAction
+                  onPress={() => navigation.popToTop()}
+                  color={theme.colors.onPrimary}
+                />
               )}
               <Appbar.Content title={route} />
             </View>

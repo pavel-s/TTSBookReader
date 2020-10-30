@@ -59,13 +59,13 @@ const Chapter = ({
       ) {
         //scroll to +5 paragraph
         setTimeout(() => {
-          scrollRef.current.scrollToIndex({
+          scrollRef.current?.scrollToIndex({
             animate: false,
             index: highestMeasuredFrameIndex + 5,
           });
           //then try scroll to index again
           setTimeout(() => {
-            scrollRef.current.scrollToIndex({
+            scrollRef.current?.scrollToIndex({
               animate: false,
               index: index,
             });

@@ -1,16 +1,13 @@
 import * as Speech from 'expo-speech';
-import { speak } from '../utils/tts-promise';
+import { speak } from '../api/tts';
 import { readBookFile } from './filesReducer';
 import { setBookmark } from './libraryReducer';
 
-const SET_OPTIONS = 'TTSBookReader/readerReducer/SET_OPTIONS';
 export const TTS_STATUSES = { speaking: 'speaking', paused: 'paused' };
 const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
 const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
-const SET_FONT_SIZE = 'TTSBookReader/readerReducer/SET_FONT_SIZE';
 
-//todo: add in progress state
 /**
  * @typedef {Object} State
  * @property {String} status
@@ -19,7 +16,6 @@ const SET_FONT_SIZE = 'TTSBookReader/readerReducer/SET_FONT_SIZE';
  * @property {Number} totalChapters
  * @property {[Array]} content - chapters or pages
  * @property {{chapter: Number, paragraph: Number}} current - index of current chapter and paragraph
- * @property {{pitch: Number, rate: Number, language: String}} options
  */
 
 /**
@@ -33,12 +29,6 @@ const initialState = {
   totalChapters: 0,
   content: [],
   current: { chapter: 0, paragraph: 0 },
-  options: {
-    pitch: 1,
-    rate: 2.6,
-    language: 'en',
-  },
-  fontSize: 15,
 };
 
 /**
@@ -47,9 +37,6 @@ const initialState = {
  */
 const readerReducer = (state = initialState, { type, payload }) => {
   switch (type) {
-    case SET_OPTIONS:
-      return { ...state, options: payload };
-
     case SET_STATUS:
       return { ...state, status: payload };
 
@@ -64,30 +51,10 @@ const readerReducer = (state = initialState, { type, payload }) => {
         content: payload.content,
       };
 
-    case SET_FONT_SIZE:
-      const newSize =
-        typeof payload === 'number'
-          ? payload
-          : payload === 'increase'
-          ? state.fontSize + 1
-          : state.fontSize - 1;
-      return {
-        ...state,
-        fontSize: newSize,
-      };
-
     default:
       return state;
   }
 };
-
-/**
- * @param {{voice: String, pitch: Number, rate: Number}} payload
- */
-export const setTTSOptions = (payload) => ({
-  type: SET_OPTIONS,
-  payload,
-});
 
 /**
  * @param {String} payload - TTS_STATUSES
@@ -116,13 +83,7 @@ export const setBook = (payload) => ({
 });
 
 /**
- *
- * @param {*} payload - font size Integer or 'increase'/'decrease' String
- */
-export const setFontSize = (payload) => ({ type: SET_FONT_SIZE, payload });
-
-/**
- * Speak all chapters form current chapter and paragraph[index]
+ * Speak all chapters form current chapter and paragraph index
  * @param {Number} index
  * @return {void}
  */
@@ -162,7 +123,7 @@ export const speakAll = (index) => async (dispatch, getState) => {
       );
 
       try {
-        await speak(content[i].text, state.reader.options);
+        await speak(content[i].text, state.settings.tts);
       } catch (error) {
         console.log(error);
       }
