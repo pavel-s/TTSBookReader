@@ -15,6 +15,7 @@ import {
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
+import withAppBar from '../../components/hoc/withAppBar';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,8 @@ const Reader = () => {
   const current = useSelector((state) => state.reader.current);
   const bookContent = useSelector((state) => state.reader.content);
 
+  // system app state: active, background (in another app, on the home screen,
+  // [Android] on another Activity (even if it was launched by your app)), [iOS] inactive
   const [appState, setAppState] = useState(AppState.currentState);
   useEffect(() => {
     const listener = (state) => setAppState(state);
@@ -33,16 +36,14 @@ const Reader = () => {
     return () => AppState.removeEventListener('change', listener);
   }, []);
 
+  const activeBookId = useSelector((state) => state.library.activeBook);
   //initially request chapter content
   useEffect(() => {
     dispatch(getBook());
-  }, []);
+  }, [activeBookId]);
 
   //styles for chapter
-  const {
-    activeParagraph: activeParagraphColor,
-    onSurface,
-  } = useTheme().colors;
+  const themeColors = useTheme().colors;
 
   const chapterStyles = useMemo(
     () =>
@@ -50,17 +51,17 @@ const Reader = () => {
         container: { flex: 1 },
         content: { padding: 5, width },
         paragraph: {
-          color: onSurface,
+          color: themeColors.onSurface,
           fontSize: fontSize,
           paddingVertical: 5,
         },
         activeParagraph: {
-          color: onSurface,
+          color: themeColors.onSurface,
           fontSize: fontSize,
-          backgroundColor: activeParagraphColor,
+          backgroundColor: themeColors.activeParagraph,
         },
       }),
-    [fontSize]
+    [fontSize, themeColors]
   );
 
   //horizontal scroll to current chapter cell of FlatList
@@ -150,20 +151,5 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-export default Reader;
-
-/*
-
-  const handlePressNav = (prev) => {
-    dispatch(goToChapter(prev ? current.chapter - 1 : current.chapter + 1));
-  };
-
-      {current.chapter > 0 && (
-        <NavButton prev handlePress={() => handlePressNav(true)} />
-      )}
-      {current.chapter < totalChapters - 1 && (
-        <NavButton handlePress={() => handlePressNav()} />
-      )}
-
-
-*/
+export default withAppBar(Reader);
+// export default Reader;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, Image, FlatList, Text } from 'react-native';
+import { Image, FlatList, Text } from 'react-native';
 import defaultImage from '../../../assets/default_image.png';
 
 class ChapterParagraph extends React.PureComponent {
@@ -12,7 +12,7 @@ class ChapterParagraph extends React.PureComponent {
       <Image
         source={{ uri: this.props.item.image }}
         loadingIndicatorSource={defaultImage}
-        style={chapterStyles.image}
+        style={this.props.chapterStyles.image}
       />
     ) : (
       <Text
@@ -106,50 +106,4 @@ const Chapter = ({
 
 const keyExtractor = (item, index) => 'p' + index;
 
-const chapterStyles = StyleSheet.create({
-  image: {
-    width: '100%',
-    height: 300,
-    resizeMode: 'contain',
-    marginBottom: 5,
-  },
-});
-
 export default React.memo(Chapter);
-
-/*
-
-      <Paragraph
-        style={
-          isActive
-            ? { ...styles.paragraph, backgroundColor: activeParagraphColor }
-            : styles.paragraph
-        }
-        onPress={() => handlePressParagraph(index)}
-      >
-        {item.text}
-      </Paragraph>
-
-*/
-
-/*
-
-
-  const ChapterParagraph = React.memo(({ item, index, isActive }) =>
-    item.image ? (
-      <Image source={item.image} />
-    ) : (
-      <Text
-        onPress={() => {
-          handlePressParagraph(index);
-        }}
-        style={
-          isActive ? chapterStyles.activeParagraph : chapterStyles.paragraph
-        }
-      >
-        {item.text}
-      </Text>
-    )
-  );
-
-*/

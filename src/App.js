@@ -165,7 +165,8 @@ export default function App() {
               >
                 <Drawer.Screen name='Library' component={Library} />
                 {activeBook && (
-                  <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
+                  <Drawer.Screen name='Reader' component={Reader} />
+                  // <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
                 )}
                 <Drawer.Screen name='Settings' component={Settings} />
               </Drawer.Navigator>
