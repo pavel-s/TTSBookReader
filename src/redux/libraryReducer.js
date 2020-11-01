@@ -48,15 +48,15 @@ const libraryReducer = (state = initialState, { type, payload }) => {
       return { ...state, activeBook: payload };
 
     case SET_BOOKMARK:
-      const newState = { ...state };
-      const bookIndex = newState.books.findIndex(
+      const newBooks = [...state.books];
+      const bookIndex = newBooks.findIndex(
         (book) => book.id === payload.bookId
       );
-      newState.books[bookIndex] = {
-        ...newState.books[bookIndex],
+      newBooks[bookIndex] = {
+        ...newBooks[bookIndex],
         bookmark: payload.bookmark,
       };
-      return newState;
+      return { ...state, books: newBooks };
 
     case CLEAR_LIBRARY:
       return { ...state, books: [], activeBook: null };
