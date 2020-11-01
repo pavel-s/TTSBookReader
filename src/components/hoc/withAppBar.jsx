@@ -1,9 +1,9 @@
 import React from 'react';
-import AppBar from '../AppBar';
+import AppBar from '../AppBar/AppBar';
 
 const withAppBar = (Component) => (props) => (
   <>
-    <AppBar route={props.route.name} navigation={props.navigation} />
+    <AppBar route={props.route} navigation={props.navigation} />
     <Component {...props} />
   </>
 );

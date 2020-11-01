@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { RadioButton, Surface } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux';
-import { createNativeStackNavigator } from 'react-native-screens/native-stack';
+import { Surface } from 'react-native-paper';
 import { TransitionPresets } from '@react-navigation/stack';
 import VoiceSelector from './VoiceSelector';
-import withAppBar from './../../components/hoc/withAppBar';
 import { TTSSettings } from './TTSSettings';
 import { createStackNavigator } from '@react-navigation/stack';
+import { StackHeader } from './../../components/AppBar/StackHeader';
 
 const Stack = createStackNavigator();
 
-const Settings = withAppBar(({ navigation }) => {
+const Settings = ({ navigation }) => {
   return (
     <Surface style={styles.container}>
       <ScrollView style={styles.scrollContainer}>
@@ -19,14 +17,14 @@ const Settings = withAppBar(({ navigation }) => {
       </ScrollView>
     </Surface>
   );
-});
+};
 
 const SettingsContainer = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
         ...TransitionPresets.SlideFromRightIOS,
+        header: StackHeader,
       }}
       initialRouteName='Settings'
     >

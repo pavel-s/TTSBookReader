@@ -1,11 +1,15 @@
 import React from 'react';
-import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import OpenBookScreen from './OpenBookScreen';
 import { useSelector } from 'react-redux';
 import BooksScreen from './BooksScreen';
 import BookInfo from './BookInfo';
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from '@react-navigation/stack';
+import { StackHeader } from './../../components/AppBar/StackHeader';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 const Library = () => {
   const library = useSelector((state) => state.library);
@@ -13,7 +17,8 @@ const Library = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
+        ...TransitionPresets.SlideFromRightIOS,
+        header: StackHeader,
       }}
       initialRouteName='Books'
     >

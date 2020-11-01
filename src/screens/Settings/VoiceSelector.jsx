@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { List, ActivityIndicator, TextInput } from 'react-native-paper';
-import { FlatList, StyleSheet, View } from 'react-native';
-import withAppBar from './../../components/hoc/withAppBar';
+import { FlatList, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTTSOption } from './../../redux/settingsReducer';
 
@@ -77,4 +76,4 @@ const styles = StyleSheet.create({
   currentVoice: { backgroundColor: 'darkblue' },
 });
 
-export default withAppBar(VoiceSelector);
+export default VoiceSelector;

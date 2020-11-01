@@ -7,7 +7,6 @@ import {
   Surface,
   Title,
 } from 'react-native-paper';
-import withAppBar from './../../components/hoc/withAppBar';
 import * as Linking from 'expo-linking';
 
 const BookInfo = ({ route }) => {
@@ -52,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withAppBar(BookInfo);
+export default BookInfo;

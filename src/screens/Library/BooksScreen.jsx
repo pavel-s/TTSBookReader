@@ -10,7 +10,6 @@ import {
 } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { setActiveBook, clearLibrary } from './../../redux/libraryReducer';
-import withAppBar from './../../components/hoc/withAppBar';
 
 const BooksScreen = React.memo(({ navigation, books }) => {
   const dispatch = useDispatch();
@@ -110,4 +109,4 @@ const styles = StyleSheet.create({
   clearButton: { marginTop: 40 },
 });
 
-export default withAppBar(BooksScreen);
+export default BooksScreen;

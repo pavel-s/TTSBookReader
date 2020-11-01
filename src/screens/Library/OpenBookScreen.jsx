@@ -4,21 +4,17 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import {
-  Button,
   List,
   Divider,
-  Title,
   Chip,
   ActivityIndicator,
   Snackbar,
-  useTheme,
   Surface,
 } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { readDirectory, readBookFile } from './../../redux/filesReducer';
 import { parseFilePath } from './../../utils/common';
 import { addBook } from './../../redux/libraryReducer';
-import withAppBar from './../../components/hoc/withAppBar';
 
 const OpenBookScreen = ({ navigation }) => {
   const libraryBooks = useSelector((state) => state.library.books);
@@ -204,4 +200,4 @@ const sortEntries = (entries) => {
   return [...directories, ...files];
 };
 
-export default withAppBar(OpenBookScreen);
+export default OpenBookScreen;
