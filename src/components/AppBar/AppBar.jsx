@@ -1,25 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, TouchableHighlight } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { DrawerActions } from '@react-navigation/native';
-import {
-  Appbar,
-  TextInput,
-  Title,
-  List,
-  Surface,
-  useTheme,
-} from 'react-native-paper';
+import { Appbar, useTheme } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  TTS_STATUSES,
-  goToChapter,
-  toggleSpeaking,
-} from '../../redux/readerReducer';
+import { TTS_STATUSES, toggleSpeaking } from '../../redux/readerReducer';
 import ReaderTitle from './ReaderTitle';
 import ReaderNavMenu from './ReaderNavMenu';
 
 export const AppBar = ({ route, navigation, previous }) => {
-  console.log(`previous: `, previous);
   const dispatch = useDispatch();
   const ttsStatus = useSelector((state) => state.reader.status);
   const theme = useTheme();
