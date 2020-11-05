@@ -151,5 +151,5 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-export default withAppBar(Reader);
-// export default Reader;
+// export default withAppBar(Reader);
+export default Reader;

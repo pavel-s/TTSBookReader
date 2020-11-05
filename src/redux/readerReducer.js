@@ -13,6 +13,7 @@ const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
  * @property {String} status
  * @property {Boolean} available
  * @property {String} bookId
+ * @property {[String]} chapterTitles
  * @property {Number} totalChapters
  * @property {[Array]} content - chapters or pages
  * @property {{chapter: Number, paragraph: Number}} current - index of current chapter and paragraph
@@ -26,6 +27,7 @@ const initialState = {
   status: '',
   // available: false,
   bookId: '',
+  chapterTitles: [],
   totalChapters: 0,
   content: [],
   current: { chapter: 0, paragraph: 0 },
@@ -46,9 +48,7 @@ const readerReducer = (state = initialState, { type, payload }) => {
     case SET_BOOK:
       return {
         ...state,
-        bookId: payload.id,
-        totalChapters: payload.totalChapters,
-        content: payload.content,
+        ...payload,
       };
 
     default:
@@ -195,6 +195,9 @@ export const getBook = () => async (dispatch, getState) => {
     setBook({
       id: activeBookId,
       totalChapters: bookFile.json.chapters.length,
+      chapterTitles: Array.from(bookFile.json.chapters).map(
+        (chapter) => chapter.title
+      ),
       content: Array.from(bookFile.json.chapters).map(
         (chapter) => chapter.content
       ),

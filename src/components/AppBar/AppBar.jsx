@@ -50,7 +50,7 @@ export const AppBar = ({ route, navigation, previous }) => {
           onPress={handleToggleSpeaking}
         />
       </Appbar>
-      {showBookNav && <ReaderNavMenu />}
+      {showBookNav && <ReaderNavMenu navigation={navigation} />}
     </>
   );
 };

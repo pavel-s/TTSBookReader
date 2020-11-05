@@ -31,6 +31,7 @@ import CallDetectorManager from 'react-native-call-detection';
 import KeyEvent from 'react-native-keyevent';
 import { setFontSize, toggleTheme } from './redux/settingsReducer';
 import { initializeApp } from './redux/appReducer';
+import ReaderNavigator from './screens/Reader/ReaderNavigator';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -165,7 +166,7 @@ export default function App() {
               >
                 <Drawer.Screen name='Library' component={Library} />
                 {activeBook && (
-                  <Drawer.Screen name='Reader' component={Reader} />
+                  <Drawer.Screen name='Reader' component={ReaderNavigator} />
                   // <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
                 )}
                 <Drawer.Screen name='Settings' component={Settings} />

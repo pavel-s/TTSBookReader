@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { TextInput, Surface } from 'react-native-paper';
+import { TextInput, Surface, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { goToChapter } from '../../redux/readerReducer';
 
-const ReaderNavMenu = () => {
+const ReaderNavMenu = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const book = useSelector((state) =>
@@ -15,20 +15,27 @@ const ReaderNavMenu = () => {
     String(book?.bookmark.chapter + 1)
   );
 
-  // update value when book was changed
+  // update inputValue when book was changed
   useEffect(() => {
     setInputValue(String(book?.bookmark.chapter + 1));
   }, [book]);
 
-  const handleGoChapter = useCallback(
+  // set and dispatch index on input change
+  const handleTextChange = useCallback(
     (value) => {
       let number = +value;
       if (number > 0 && Number.isInteger(number)) {
         if (number < book?.chaptersList.length) {
-          dispatch(goToChapter(number - 1));
+          // use current index
+          dispatch(goToChapter(number - 1)); // note: index start from 1 in ui
           setInputValue(value);
+        } else {
+          // use last available index
+          dispatch(goToChapter(book?.chaptersList.length - 2));
+          setInputValue(String(book?.chaptersList.length - 2));
         }
       } else {
+        // clear input
         setInputValue('');
       }
     },
@@ -36,21 +43,30 @@ const ReaderNavMenu = () => {
   );
 
   return (
-    <Surface style={styles.bookNav}>
+    <Surface style={styles.bookNav} elevation={5}>
       <TextInput
         style={styles.input}
         label='Chapter'
         placeholder={'123'}
         value={inputValue}
-        onChangeText={handleGoChapter}
+        onChangeText={handleTextChange}
         keyboardType='numeric'
+      />
+      <IconButton
+        icon='table-of-contents'
+        size={30}
+        onPress={() => navigation.navigate({ name: 'Table of Contents' })}
       />
     </Surface>
   );
 };
 
 const styles = StyleSheet.create({
-  bookNav: { alignItems: 'center' },
+  bookNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   input: {
     width: 120,
     backgroundColor: 'rgba(0,0,0,0.2)',
