@@ -34,7 +34,6 @@ const initialState = {
 };
 
 /**
- *
  * @param {State} state
  */
 const readerReducer = (state = initialState, { type, payload }) => {
@@ -84,7 +83,7 @@ export const setBook = (payload) => ({
 
 /**
  * Speak all chapters form current chapter and paragraph index
- * @param {Number} index
+ * @param {Number} [index]
  * @return {void}
  */
 export const speakAll = (index) => async (dispatch, getState) => {
@@ -151,7 +150,6 @@ export const toggleSpeaking = (index) => (dispatch, getState) => {
   if (state.reader.status === TTS_STATUSES.speaking) {
     dispatch(stopSpeaking());
   } else {
-    // await dispatch(setCurrent({ ...state.reader.current, paragraph: index }));
     dispatch(speakAll(index));
   }
 };
@@ -164,7 +162,7 @@ export const goToChapter = (index) => async (dispatch, getState) => {
 
   dispatch(
     setBookmark({
-      bookId: state.library.activeBook,
+      bookId: state.reader.activeBook,
       bookmark: bookmark,
     })
   );
@@ -194,7 +192,7 @@ export const getBook = () => async (dispatch, getState) => {
 
   dispatch(
     setBook({
-      id: activeBookId,
+      bookId: activeBookId,
       totalChapters: bookFile.json.chapters.length,
       chapterTitles: Array.from(bookFile.json.chapters).map(
         (chapter) => chapter.title
