@@ -138,6 +138,7 @@ export const speakAll = (index) => async (dispatch, getState) => {
     }
     paragraphIndex = 0;
   }
+  dispatch(stopSpeaking());
 };
 
 export const stopSpeaking = () => async (dispatch, getState) => {
