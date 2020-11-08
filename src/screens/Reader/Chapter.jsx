@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Image, FlatList, Text } from 'react-native';
-import defaultImage from '../../../assets/default_image.png';
+import { FlatList, Text } from 'react-native';
+import Img from '../../components/Img';
 
 class ChapterParagraph extends React.PureComponent {
   handlePress = () => {
@@ -9,10 +9,9 @@ class ChapterParagraph extends React.PureComponent {
 
   render() {
     return this.props.item.image ? (
-      <Image
+      <Img
         source={{ uri: this.props.item.image }}
-        loadingIndicatorSource={defaultImage}
-        style={this.props.chapterStyles.image}
+        screenPadding={this.props.chapterStyles.content.padding}
       />
     ) : (
       <Text
