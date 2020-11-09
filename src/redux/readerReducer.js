@@ -162,7 +162,7 @@ export const goToChapter = (index) => async (dispatch, getState) => {
 
   dispatch(
     setBookmark({
-      bookId: state.reader.activeBook,
+      bookId: state.reader.bookId,
       bookmark: bookmark,
     })
   );
