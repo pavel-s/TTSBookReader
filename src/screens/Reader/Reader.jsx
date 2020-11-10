@@ -15,7 +15,6 @@ import {
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
-import withAppBar from '../../components/hoc/withAppBar';
 
 const { width } = Dimensions.get('window');
 
@@ -64,10 +63,14 @@ const Reader = () => {
     [fontSize, themeColors]
   );
 
-  //horizontal scroll to current chapter cell of FlatList
+  // Horizontal scroll to current chapter cell of FlatList.
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
-    if (chaptersScrollRef.current && appState === 'active') {
+    if (
+      chaptersScrollRef.current &&
+      appState === 'active' &&
+      !current.changedByScrolling
+    ) {
       chaptersScrollRef.current.scrollToIndex({
         animate: false,
         index: current.chapter,
@@ -100,7 +103,7 @@ const Reader = () => {
         contentOffset.x / layoutMeasurement.width
       );
       if (chapterIndex !== current.chapter) {
-        dispatch(goToChapter(chapterIndex));
+        dispatch(goToChapter(chapterIndex, true));
       }
     },
     [current.chapter]

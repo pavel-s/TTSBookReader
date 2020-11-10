@@ -16,7 +16,14 @@ const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
  * @property {[String]} chapterTitles
  * @property {Number} totalChapters
  * @property {[Array]} content - chapters or pages
- * @property {{chapter: Number, paragraph: Number}} current - index of current chapter and paragraph
+ * @property {Current} current
+ */
+
+/**
+ * @typedef {Object} Current
+ * @property {Number} chapter - index of current chapter
+ * @property {Number} paragraph - index of current paragraph
+ * @property {Boolean} [changedByScrolling] - is chapter was changed by scrolling?
  */
 
 /**
@@ -154,7 +161,14 @@ export const toggleSpeaking = (index) => (dispatch, getState) => {
   }
 };
 
-export const goToChapter = (index) => async (dispatch, getState) => {
+/**
+ * @param {Number} index
+ * @param {Boolean} isScrolling - true if index was changed by scrolling
+ */
+export const goToChapter = (index, isScrolling = false) => async (
+  dispatch,
+  getState
+) => {
   const state = getState();
   const bookmark = { chapter: index, paragraph: 0 };
 
@@ -167,7 +181,7 @@ export const goToChapter = (index) => async (dispatch, getState) => {
     })
   );
 
-  dispatch(setCurrent(bookmark));
+  dispatch(setCurrent({ ...bookmark, changedByScrolling: isScrolling }));
 };
 
 export const getBook = () => async (dispatch, getState) => {
