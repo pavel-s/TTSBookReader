@@ -7,11 +7,13 @@ export const TTS_STATUSES = { speaking: 'speaking', paused: 'paused' };
 const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
 const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
+const REQUEST_BOOK = 'TTSBookReader/readerReducer/REQUEST_BOOK';
 
 /**
  * @typedef {Object} State
  * @property {String} status
  * @property {Boolean} available
+ * @property {Boolean} isFetching
  * @property {String} bookId
  * @property {[String]} chapterTitles
  * @property {Number} totalChapters
@@ -33,11 +35,12 @@ const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
 const initialState = {
   status: '',
   // available: false,
+  isFetching: false,
   bookId: '',
   chapterTitles: [],
-  totalChapters: 0,
+  totalChapters: null,
   content: [],
-  current: { chapter: 0, paragraph: 0 },
+  current: {},
 };
 
 /**
@@ -55,7 +58,11 @@ const readerReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         ...payload,
+        isFetching: false,
       };
+
+    case REQUEST_BOOK:
+      return { ...state, isFetching: true };
 
     default:
       return state;
@@ -86,6 +93,13 @@ export const setCurrent = (payload) => ({
 export const setBook = (payload) => ({
   type: SET_BOOK,
   payload,
+});
+
+/**
+ * set isFetching to true
+ */
+export const requestBook = () => ({
+  type: REQUEST_BOOK,
 });
 
 /**
@@ -185,6 +199,7 @@ export const goToChapter = (index, isScrolling = false) => async (
 };
 
 export const getBook = () => async (dispatch, getState) => {
+  dispatch(requestBook());
   dispatch(stopSpeaking());
 
   const state = getState();
@@ -214,12 +229,7 @@ export const getBook = () => async (dispatch, getState) => {
       content: Array.from(bookFile.json.chapters).map(
         (chapter) => chapter.content
       ),
-    })
-  );
-
-  dispatch(
-    setCurrent({
-      ...book.bookmark,
+      current: { ...book.bookmark },
     })
   );
 };

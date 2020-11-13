@@ -15,6 +15,7 @@ import {
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
+import { readerIsFetching } from './../../redux/selectors';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +26,7 @@ const Reader = () => {
 
   const current = useSelector((state) => state.reader.current);
   const bookContent = useSelector((state) => state.reader.content);
+  const isFetching = useSelector(readerIsFetching);
 
   // system app state: active, background (in another app, on the home screen,
   // [Android] on another Activity (even if it was launched by your app)), [iOS] inactive
@@ -67,6 +69,7 @@ const Reader = () => {
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
     if (
+      current.chapter !== undefined &&
       chaptersScrollRef.current &&
       appState === 'active' &&
       !current.changedByScrolling
@@ -109,11 +112,7 @@ const Reader = () => {
     [current.chapter]
   );
 
-  if (appState !== 'active') {
-    return null;
-  }
-
-  if (!bookContent || !bookContent.length) {
+  if (isFetching) {
     return <ActivityIndicator style={{ flex: 1 }} />;
   }
 
