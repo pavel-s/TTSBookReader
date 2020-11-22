@@ -1,85 +1,109 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+  useMemo,
+} from 'react';
 import { FlatList, Text } from 'react-native';
+import { Constants } from 'react-native-unimodules';
 import Img from '../../components/Img';
+import useMounted from './../../hooks/useMounted';
+import ChapterFooter from './ChapterFooter';
 
-class ChapterParagraph extends React.PureComponent {
-  handlePress = () => {
-    this.props.handlePressParagraph(this.props.index);
-  };
-
-  render() {
-    return this.props.item.image ? (
+const ChapterParagraph = React.memo(
+  ({ item, index, isActive, handlePressParagraph, chapterStyles }) =>
+    item.image ? (
       <Img
-        source={{ uri: this.props.item.image }}
-        screenPadding={this.props.chapterStyles.content.padding}
+        source={{ uri: item.image }}
+        screenPadding={chapterStyles.content.padding}
       />
     ) : (
       <Text
-        onPress={this.handlePress}
-        style={
-          this.props.isActive
-            ? this.props.chapterStyles.activeParagraph
-            : this.props.chapterStyles.paragraph
-        }
+        onPress={() => handlePressParagraph(index)}
+        style={[
+          chapterStyles.paragraph,
+          isActive && chapterStyles.activeParagraph,
+        ]}
       >
-        {this.props.item.text}
+        {Constants.isDevice ? item.text : index + item.text}
       </Text>
-    );
-  }
-}
+    )
+);
+
+const maxToRenderPerBatch = 28;
 
 const Chapter = ({
   chapter,
-  appState,
-  chapterIndex,
   current,
   handlePressParagraph,
   chapterStyles,
+  chapterIndex,
+  isLastChapter,
+  scrollToNextChapter,
+  isSpeaking,
 }) => {
+  const isCurrentChapter = !!current;
+  const isMounted = useMounted();
   const scrollRef = useRef(null);
-  const currentParagraph = current ? current.paragraph : 0;
+  const scrollErrorRef = useRef(false);
 
-  //scroll to active paragraph
-  const scrollToCurrentParagraph = () => {
-    if (current && scrollRef.current && appState === 'active') {
-      scrollRef.current.scrollToIndex({
-        animate: false,
-        index: currentParagraph,
-      });
+  const currentParagraphRef = useRef(null);
+  currentParagraphRef.current = isCurrentChapter ? current.paragraph : 0;
+
+  const isCurrentNotInWindow =
+    currentParagraphRef.current + 1 > maxToRenderPerBatch;
+
+  // if loadUntilCurrent is true - set initialNumToRender = current.paragraph + 1 to load all items (paragraphs)
+  // up to current index. After that we can scroll to needed index
+  const [loadUntilCurrent, setLoadUntilCurrent] = useState(
+    isCurrentNotInWindow
+  );
+
+  const scrollToCurrentParagraph = useCallback(() => {
+    scrollRef.current?.scrollToIndex({
+      animate: true,
+      index: currentParagraphRef.current,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isCurrentChapter && currentParagraphRef.current > 0)
+      scrollToCurrentParagraph();
+  }, [currentParagraphRef.current, isCurrentChapter, isSpeaking]);
+
+  const scrollToCurrentIfError = useCallback(() => {
+    if (isMounted.current && scrollErrorRef.current) {
+      scrollErrorRef.current = false;
+      scrollToCurrentParagraph();
+      // setLoadUntilCurrent(false);
     }
-  };
-  useEffect(scrollToCurrentParagraph, [currentParagraph, appState]);
+  }, []);
 
   const handleScrollToIndexFailed = useCallback(
     ({ index, highestMeasuredFrameIndex }) => {
-      if (
-        index > highestMeasuredFrameIndex &&
-        highestMeasuredFrameIndex + 5 < (chapter ? chapter.length : 0)
-      ) {
-        //scroll to +5 paragraph
-        setTimeout(() => {
-          scrollRef.current?.scrollToIndex({
-            animate: false,
-            index: highestMeasuredFrameIndex + 5,
-          });
-          //then try scroll to index again
-          setTimeout(() => {
-            scrollRef.current?.scrollToIndex({
-              animate: false,
-              index: index,
-            });
-          }, 10);
-        }, 10);
+      if (isMounted.current && index > highestMeasuredFrameIndex) {
+        scrollErrorRef.current = true;
+        setLoadUntilCurrent(true);
       }
     },
-    [chapter]
+    []
+  );
+
+  const chapterFooter = useMemo(
+    () => (
+      <ChapterFooter
+        {...{ chapterIndex, isLastChapter, scrollToNextChapter }}
+      />
+    ),
+    [chapterIndex, isLastChapter, scrollToNextChapter]
   );
 
   const renderParagraph = ({ item, index }) => (
     <ChapterParagraph
       item={item}
       index={index}
-      isActive={index === currentParagraph}
+      isActive={index === currentParagraphRef.current}
       chapterStyles={chapterStyles}
       handlePressParagraph={handlePressParagraph}
     />
@@ -92,13 +116,20 @@ const Chapter = ({
       renderItem={renderParagraph}
       keyExtractor={keyExtractor}
       onScrollToIndexFailed={handleScrollToIndexFailed}
+      onContentSizeChange={isCurrentChapter && scrollToCurrentIfError}
       contentContainerStyle={chapterStyles.content}
-      extraData={currentParagraph}
-      scrollEventThrottle={32}
-      maxToRenderPerBatch={3}
-      updateCellsBatchingPeriod={80}
-      windowSize={20}
-      initialNumToRender={10}
+      extraData={currentParagraphRef.current}
+      scrollEventThrottle={64}
+      maxToRenderPerBatch={maxToRenderPerBatch}
+      updateCellsBatchingPeriod={32}
+      windowSize={isCurrentChapter ? 7 : 3}
+      initialNumToRender={
+        isCurrentChapter && loadUntilCurrent
+          ? currentParagraphRef.current + maxToRenderPerBatch // render additional items, then current item will be on top
+          : maxToRenderPerBatch
+      }
+      removeClippedSubviews={false}
+      ListFooterComponent={chapterFooter}
     />
   );
 };

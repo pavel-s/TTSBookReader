@@ -62,7 +62,7 @@ const readerReducer = (state = initialState, { type, payload }) => {
       };
 
     case REQUEST_BOOK:
-      return { ...state, isFetching: true };
+      return { ...initialState, isFetching: true };
 
     default:
       return state;
@@ -96,7 +96,7 @@ export const setBook = (payload) => ({
 });
 
 /**
- * set isFetching to true
+ * reset State, set isFetching to true
  */
 export const requestBook = () => ({
   type: REQUEST_BOOK,

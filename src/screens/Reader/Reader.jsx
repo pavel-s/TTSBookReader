@@ -1,11 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from 'react';
-import { View, StyleSheet, FlatList, AppState, Dimensions } from 'react-native';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import { StyleSheet, FlatList, Dimensions } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import {
@@ -15,7 +9,7 @@ import {
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
-import { readerIsFetching } from './../../redux/selectors';
+import { readerIsFetching, readerIsSpeaking } from './../../redux/selectors';
 
 const { width } = Dimensions.get('window');
 
@@ -25,17 +19,10 @@ const Reader = () => {
   const fontSize = useSelector((state) => state.settings.fontSize);
 
   const current = useSelector((state) => state.reader.current);
+  const isReaderNotInit = current.chapter === undefined; // todo: remove after add container for Reader
   const bookContent = useSelector((state) => state.reader.content);
   const isFetching = useSelector(readerIsFetching);
-
-  // system app state: active, background (in another app, on the home screen,
-  // [Android] on another Activity (even if it was launched by your app)), [iOS] inactive
-  const [appState, setAppState] = useState(AppState.currentState);
-  useEffect(() => {
-    const listener = (state) => setAppState(state);
-    AppState.addEventListener('change', listener);
-    return () => AppState.removeEventListener('change', listener);
-  }, []);
+  const isSpeaking = useSelector(readerIsSpeaking);
 
   const activeBookId = useSelector((state) => state.library.activeBook);
   //initially request chapter content
@@ -57,8 +44,6 @@ const Reader = () => {
           paddingVertical: 5,
         },
         activeParagraph: {
-          color: themeColors.onSurface,
-          fontSize: fontSize,
           backgroundColor: themeColors.activeParagraph,
         },
       }),
@@ -68,18 +53,20 @@ const Reader = () => {
   // Horizontal scroll to current chapter cell of FlatList.
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
-    if (
-      current.chapter !== undefined &&
-      chaptersScrollRef.current &&
-      appState === 'active' &&
-      !current.changedByScrolling
-    ) {
-      chaptersScrollRef.current.scrollToIndex({
+    if (!isReaderNotInit && !current.changedByScrolling) {
+      chaptersScrollRef.current?.scrollToIndex({
         animate: false,
         index: current.chapter,
       });
     }
   }, [current.chapter]);
+
+  const scrollToNextChapter = useCallback((currentIndex) => {
+    chaptersScrollRef.current?.scrollToIndex({
+      animate: true,
+      index: currentIndex + 1,
+    });
+  }, []);
 
   const handlePressParagraph = useCallback((index) => {
     dispatch(toggleSpeaking(index));
@@ -90,55 +77,65 @@ const Reader = () => {
     return (
       <Chapter
         chapter={chapter}
-        appState={isCurrent && appState}
-        fontSize={fontSize}
         chapterIndex={index}
         handlePressParagraph={handlePressParagraph}
         current={isCurrent && current}
         chapterStyles={chapterStyles}
+        isLastChapter={index === bookContent.length - 1}
+        scrollToNextChapter={scrollToNextChapter}
+        isSpeaking={isCurrent && isSpeaking}
       />
     );
   };
 
-  const setCurrentChapter = useCallback(
-    ({ nativeEvent: { contentOffset, layoutMeasurement } }) => {
-      const chapterIndex = Math.round(
-        contentOffset.x / layoutMeasurement.width
-      );
-      if (chapterIndex !== current.chapter) {
-        dispatch(goToChapter(chapterIndex, true));
-      }
-    },
-    [current.chapter]
-  );
+  const currentRef = useRef(null);
+  currentRef.current = current;
+  const setCurrentChapter = useCallback(({ viewableItems }) => {
+    if (
+      viewableItems.length &&
+      viewableItems[0].index !== currentRef.current.chapter &&
+      currentRef.current.chapter !== undefined //isReaderNotInit //todo: remove
+    ) {
+      dispatch(goToChapter(viewableItems[0].index, true));
+    }
+  }, []);
 
-  if (isFetching) {
-    return <ActivityIndicator style={{ flex: 1 }} />;
+  const initialScrollIndex = useMemo(() => current.chapter, [
+    activeBookId,
+    isReaderNotInit,
+  ]);
+
+  if (isFetching || isReaderNotInit) {
+    return <ActivityIndicator style={styles.container} />;
   }
 
   return (
-    <View style={styles.container}>
-      <Surface>
-        <FlatList
-          data={bookContent}
-          horizontal
-          pagingEnabled
-          getItemLayout={getItemLayout}
-          maxToRenderPerBatch={1}
-          updateCellsBatchingPeriod={100}
-          windowSize={5}
-          initialNumToRender={5}
-          initialScrollIndex={current.chapter}
-          removeClippedSubviews
-          keyExtractor={keyExtractor}
-          renderItem={renderChapter}
-          ref={chaptersScrollRef}
-          onMomentumScrollEnd={setCurrentChapter}
-          scrollEventThrottle={32}
-        />
-      </Surface>
-    </View>
+    <Surface style={styles.container}>
+      <FlatList
+        data={bookContent}
+        horizontal
+        pagingEnabled
+        getItemLayout={getItemLayout}
+        maxToRenderPerBatch={1}
+        updateCellsBatchingPeriod={100}
+        windowSize={5}
+        initialNumToRender={1}
+        initialScrollIndex={initialScrollIndex}
+        keyExtractor={keyExtractor}
+        renderItem={renderChapter}
+        ref={chaptersScrollRef}
+        scrollEventThrottle={64}
+        style={styles.container}
+        viewabilityConfig={viewabilityConfig}
+        onViewableItemsChanged={setCurrentChapter}
+      />
+    </Surface>
   );
+};
+
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 99,
+  minimumViewTime: 10,
 };
 
 const getItemLayout = (data, index) => ({
@@ -153,5 +150,4 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-// export default withAppBar(Reader);
 export default Reader;
