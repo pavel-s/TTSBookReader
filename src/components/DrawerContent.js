@@ -2,16 +2,12 @@ import React from 'react';
 import {
   DrawerContentScrollView,
   DrawerItemList,
-  DrawerItem,
 } from '@react-navigation/drawer';
 import {
-  Divider,
   Drawer,
   Switch,
   TouchableRipple,
-  Title,
   Text,
-  Button,
   IconButton,
 } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
@@ -27,24 +23,31 @@ const DrawerContent = ({
     <DrawerContentScrollView {...props}>
       <Drawer.Section>
         <DrawerItemList {...props} />
-        <DrawerItem label='Custom item' />
       </Drawer.Section>
 
       <Drawer.Section title={'Preferences'}>
         <TouchableRipple onPress={toggleTheme}>
           <View style={styles.preference}>
-            <Text>Dark Theme</Text>
+            <Text style={styles.text}>Dark Theme</Text>
             <View pointerEvents='none'>
               <Switch value={isDarkTheme} />
             </View>
           </View>
         </TouchableRipple>
         <View style={styles.preference}>
-          <Text>Font Size</Text>
+          <Text style={styles.text}>Font Size</Text>
           <View style={styles.fontSize}>
-            <IconButton icon='minus' onPress={() => setFontSize('decrease')} />
-            <Text>{fontSize}</Text>
-            <IconButton icon='plus' onPress={() => setFontSize('increase')} />
+            <IconButton
+              style={styles.text}
+              icon='minus'
+              onPress={() => setFontSize('decrease')}
+            />
+            <Text style={styles.text}>{fontSize}</Text>
+            <IconButton
+              style={styles.text}
+              icon='plus'
+              onPress={() => setFontSize('increase')}
+            />
           </View>
         </View>
       </Drawer.Section>
@@ -57,13 +60,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingLeft: 20,
+    paddingRight: 15,
     paddingVertical: 15,
   },
   fontSize: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  text: {
+    opacity: 0.68,
   },
 });
 

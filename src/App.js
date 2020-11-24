@@ -6,10 +6,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-community/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Library from './screens/Library/Library';
-import Reader from './screens/Reader/Reader';
 import Settings from './screens/Settings/Settings';
 import { useSelector, useDispatch } from 'react-redux';
-import withAppBar from './components/hoc/withAppBar';
 import DrawerContent from './components/DrawerContent';
 
 import {
@@ -32,6 +30,7 @@ import KeyEvent from 'react-native-keyevent';
 import { setFontSize, toggleTheme } from './redux/settingsReducer';
 import { initializeApp } from './redux/appReducer';
 import ReaderNavigator from './screens/Reader/ReaderNavigator';
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -164,12 +163,23 @@ export default function App() {
                   />
                 )}
               >
-                <Drawer.Screen name='Library' component={Library} />
+                <Drawer.Screen
+                  name='Library'
+                  component={Library}
+                  options={screenOptions.library}
+                />
                 {activeBook && (
-                  <Drawer.Screen name='Reader' component={ReaderNavigator} />
-                  // <Drawer.Screen name='Reader' component={withAppBar(Reader)} />
+                  <Drawer.Screen
+                    name='Reader'
+                    component={ReaderNavigator}
+                    options={screenOptions.reader}
+                  />
                 )}
-                <Drawer.Screen name='Settings' component={Settings} />
+                <Drawer.Screen
+                  name='Settings'
+                  component={Settings}
+                  options={screenOptions.settings}
+                />
               </Drawer.Navigator>
             </NavigationContainer>
           </SafeAreaView>
@@ -186,4 +196,20 @@ const styles = StyleSheet.create({
 
 const saveNavState = (state) => {
   AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
+};
+
+const makeDrawerIcon = (name) => ({ color }) => (
+  <Icon name={name} color={color} size={20} />
+);
+
+const screenOptions = {
+  library: {
+    drawerIcon: makeDrawerIcon('library-shelves'),
+  },
+  reader: {
+    drawerIcon: makeDrawerIcon('book-open-page-variant'),
+  },
+  settings: {
+    drawerIcon: makeDrawerIcon('settings'),
+  },
 };
