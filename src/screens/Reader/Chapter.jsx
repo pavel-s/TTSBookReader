@@ -41,7 +41,7 @@ const Chapter = ({
   chapterIndex,
   isLastChapter,
   scrollToNextChapter,
-  isSpeaking,
+  needScrollToParagraph,
 }) => {
   const isCurrentChapter = !!current;
   const isMounted = useMounted();
@@ -67,10 +67,16 @@ const Chapter = ({
     });
   }, []);
 
+  // scroll to current paragraph
   useEffect(() => {
-    if (isCurrentChapter && currentParagraphRef.current > 0)
+    if (
+      isCurrentChapter &&
+      currentParagraphRef.current > 0 && // don't scroll to first
+      needScrollToParagraph
+    ) {
       scrollToCurrentParagraph();
-  }, [currentParagraphRef.current, isCurrentChapter, isSpeaking]);
+    }
+  }, [currentParagraphRef.current, isCurrentChapter, needScrollToParagraph]);
 
   const scrollToCurrentIfError = useCallback(() => {
     if (isMounted.current && scrollErrorRef.current) {
@@ -84,7 +90,7 @@ const Chapter = ({
     ({ index, highestMeasuredFrameIndex }) => {
       if (isMounted.current && index > highestMeasuredFrameIndex) {
         scrollErrorRef.current = true;
-        setLoadUntilCurrent(true);
+        highestMeasuredFrameIndex && setLoadUntilCurrent(true); // skip highestMeasuredFrameIndex == 0 (chapter is not rendered yet)
       }
     },
     []

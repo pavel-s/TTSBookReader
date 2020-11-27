@@ -22,7 +22,13 @@ const Reader = () => {
   const isReaderNotInit = current.chapter === undefined; // todo: remove after add container for Reader
   const bookContent = useSelector((state) => state.reader.content);
   const isFetching = useSelector(readerIsFetching);
+
   const isSpeaking = useSelector(readerIsSpeaking);
+  const isSpeakingPrevRef = useRef(isSpeaking);
+  const needScrollToParagraph =
+    isSpeaking === isSpeakingPrevRef.current ||
+    (isSpeaking && !isSpeakingPrevRef.current);
+  isSpeakingPrevRef.current = isSpeaking;
 
   const activeBookId = useSelector((state) => state.library.activeBook);
   //initially request chapter content
@@ -83,7 +89,7 @@ const Reader = () => {
         chapterStyles={chapterStyles}
         isLastChapter={index === bookContent.length - 1}
         scrollToNextChapter={scrollToNextChapter}
-        isSpeaking={isCurrent && isSpeaking}
+        needScrollToParagraph={isCurrent && needScrollToParagraph}
       />
     );
   };
