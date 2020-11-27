@@ -24,6 +24,7 @@ const BooksScreen = React.memo(({ navigation, books }) => {
         renderItem={renderCard}
         keyExtractor={keyExtractor}
         getItemLayout={getItemLayout}
+        contentContainerStyle={styles.list}
       />
     </View>
   );
@@ -45,6 +46,9 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 999,
+  },
+  list: {
+    paddingBottom: 100,
   },
 });
 
