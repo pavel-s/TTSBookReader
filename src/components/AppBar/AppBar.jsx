@@ -1,31 +1,20 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
 import { DrawerActions } from '@react-navigation/native';
 import { Appbar, useTheme } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux';
-import { TTS_STATUSES, toggleSpeaking } from '../../redux/readerReducer';
-import ReaderTitle from './ReaderTitle';
-import ReaderNavMenu from './ReaderNavMenu';
+import ToggleSpeakingButton from './ToggleSpeakingButton';
 
-export const AppBar = ({ route, navigation, previous }) => {
-  const dispatch = useDispatch();
-  const ttsStatus = useSelector((state) => state.reader.status);
+/**
+ * @typedef {Object} Props
+ * @property {Function=} renderTitle - function which returns React element to render instead of default title
+ * @property {Function=} renderAfter - function which returns React element to render after appbar
+ * @param {Props} props
+ */
+const AppBar = ({ route, navigation, previous, renderTitle, renderAfter }) => {
   const theme = useTheme();
-
-  const [showBookNav, setShowBookNav] = useState(false);
 
   const handlePressMenu = useCallback(() => {
     navigation.dispatch(DrawerActions.toggleDrawer());
   }, []);
-
-  const handleToggleSpeaking = useCallback((index) => {
-    dispatch(toggleSpeaking(index));
-  }, []);
-
-  const handlePressReaderTitle = useCallback(
-    () => setShowBookNav(!showBookNav),
-    [showBookNav]
-  );
 
   return (
     <>
@@ -37,33 +26,16 @@ export const AppBar = ({ route, navigation, previous }) => {
             color={theme.colors.onPrimary}
           />
         )}
-        {route.name === 'Reader' && (
-          <ReaderTitle
-            onPress={handlePressReaderTitle}
-            showBookNav={showBookNav}
-          />
+        {renderTitle ? (
+          renderTitle(route.name)
+        ) : (
+          <Appbar.Content title={route.name} />
         )}
-        {route.name !== 'Reader' && <Appbar.Content title={route.name} />}
-        <Appbar.Action
-          style={styles.toggleSpeakingBtn}
-          icon={ttsStatus === TTS_STATUSES.speaking ? 'pause' : 'play'}
-          onPress={handleToggleSpeaking}
-        />
+        <ToggleSpeakingButton />
       </Appbar>
-      {showBookNav && <ReaderNavMenu navigation={navigation} />}
+      {renderAfter && renderAfter()}
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  routeHeader: {
-    flexGrow: 1,
-  },
-  toggleSpeakingBtn: { marginLeft: 'auto' },
-});
 
 export default AppBar;

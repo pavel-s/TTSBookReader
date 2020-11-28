@@ -8,6 +8,7 @@ const SET_STATUS = 'TTSBookReader/readerReducer/SET_STATUS';
 const SET_CURRENT = 'TTSBookReader/readerReducer/SET_CURRENT';
 const SET_BOOK = 'TTSBookReader/readerReducer/SET_BOOK';
 const REQUEST_BOOK = 'TTSBookReader/readerReducer/REQUEST_BOOK';
+const TOGGLE_SHOW_NAV = 'TTSBookReader/readerReducer/TOGGLE_SHOW_NAV';
 
 /**
  * @typedef {Object} State
@@ -19,6 +20,7 @@ const REQUEST_BOOK = 'TTSBookReader/readerReducer/REQUEST_BOOK';
  * @property {Number} totalChapters
  * @property {[Array]} content - chapters or pages
  * @property {Current} current
+ * @property {Boolean} showNav
  */
 
 /**
@@ -41,6 +43,7 @@ const initialState = {
   totalChapters: null,
   content: [],
   current: {},
+  showNav: false,
 };
 
 /**
@@ -63,6 +66,9 @@ const readerReducer = (state = initialState, { type, payload }) => {
 
     case REQUEST_BOOK:
       return { ...initialState, isFetching: true };
+
+    case TOGGLE_SHOW_NAV:
+      return { ...state, showNav: !state.showNav };
 
     default:
       return state;
@@ -233,5 +239,10 @@ export const getBook = () => async (dispatch, getState) => {
     })
   );
 };
+
+/**
+ * toggle book navigation menu visibility
+ */
+export const toggleShowNav = () => ({ type: TOGGLE_SHOW_NAV });
 
 export default readerReducer;

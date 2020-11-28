@@ -1,15 +1,16 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { TextInput, Surface, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { goToChapter } from '../../redux/readerReducer';
+import { libraryActiveBook, readerShowNav } from '../../redux/selectors';
 
-const ReaderNavMenu = ({ navigation }) => {
+const ReaderNavMenu = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const book = useSelector((state) =>
-    state.library.books.find((book) => book.id === state.library.activeBook)
-  );
+  const book = useSelector(libraryActiveBook);
 
   const [inputValue, setInputValue] = useState(
     String(book?.bookmark.chapter + 1)
@@ -76,4 +77,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ReaderNavMenu);
+const ReaderNavMenuContainer = () => {
+  const showNav = useSelector(readerShowNav);
+  if (!showNav) return null;
+  return <ReaderNavMenu />;
+};
+
+export default React.memo(ReaderNavMenuContainer);

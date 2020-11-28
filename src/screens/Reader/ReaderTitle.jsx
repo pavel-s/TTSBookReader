@@ -1,17 +1,21 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Title, List, useTheme, TouchableRipple } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  libraryActiveBookChapterTitle,
+  readerShowNav,
+} from '../../redux/selectors';
+import { toggleShowNav } from './../../redux/readerReducer';
 
-const ReaderTitle = ({ onPress, showBookNav }) => {
+const ReaderTitle = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
-  const title = useSelector((state) => {
-    const book = state.library.books.find(
-      (book) => book.id === state.library.activeBook
-    );
-    return book?.chaptersList[book.bookmark.chapter];
-  });
+  const title = useSelector(libraryActiveBookChapterTitle);
+  const showBookNav = useSelector(readerShowNav);
+
+  const onPress = () => dispatch(toggleShowNav());
 
   if (!title) return null;
 
@@ -31,6 +35,7 @@ const ReaderTitle = ({ onPress, showBookNav }) => {
         <List.Icon
           icon={showBookNav ? 'chevron-up' : 'chevron-down'}
           style={styles.chapterHeaderMore}
+          color={theme.colors.onPrimary}
         />
       </View>
     </TouchableRipple>
@@ -48,7 +53,7 @@ const styles = StyleSheet.create({
   chapterHeaderMore: {
     position: 'absolute',
     width: '100%',
-    bottom: -21,
+    bottom: -22,
     opacity: 0.5,
   },
   title: { marginLeft: 10, fontSize: 18, lineHeight: 20 },

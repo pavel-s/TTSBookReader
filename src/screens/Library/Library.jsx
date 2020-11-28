@@ -1,6 +1,5 @@
 import React from 'react';
 import OpenBookScreen from './OpenBookScreen';
-import { useSelector } from 'react-redux';
 import BooksScreen from './BooksScreen';
 import BookInfo from './BookInfo';
 import {
@@ -11,24 +10,18 @@ import { StackHeader } from './../../components/AppBar/StackHeader';
 
 const Stack = createStackNavigator();
 
-const Library = () => {
-  const library = useSelector((state) => state.library);
-
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        ...TransitionPresets.SlideFromRightIOS,
-        header: StackHeader,
-      }}
-      initialRouteName='Books'
-    >
-      <Stack.Screen name='Books'>
-        {(props) => <BooksScreen {...props} books={library.books} />}
-      </Stack.Screen>
-      <Stack.Screen name='Book Info' component={BookInfo} />
-      <Stack.Screen name='Open Book' component={OpenBookScreen} />
-    </Stack.Navigator>
-  );
-};
+const Library = () => (
+  <Stack.Navigator
+    screenOptions={{
+      ...TransitionPresets.SlideFromRightIOS,
+      header: StackHeader,
+    }}
+    initialRouteName='Books'
+  >
+    <Stack.Screen name='Books' component={BooksScreen} />
+    <Stack.Screen name='Book Info' component={BookInfo} />
+    <Stack.Screen name='Open Book' component={OpenBookScreen} />
+  </Stack.Navigator>
+);
 
 export default Library;

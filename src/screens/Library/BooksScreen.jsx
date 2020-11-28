@@ -2,11 +2,13 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { FAB } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { libraryBooks } from '../../redux/selectors';
 import BookCard, { BOOK_CARD_HEIGHT } from './BookCard';
 
-const BooksScreen = React.memo(({ navigation, books }) => {
+const BooksScreen = React.memo(({ navigation }) => {
   const dispatch = useDispatch();
+  const books = useSelector(libraryBooks);
 
   const renderCard = ({ item }) => (
     <BookCard book={item} dispatch={dispatch} navigation={navigation} />
