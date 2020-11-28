@@ -5,8 +5,8 @@ import ToggleSpeakingButton from './ToggleSpeakingButton';
 
 /**
  * @typedef {Object} Props
- * @property {Function=} renderTitle - function which returns React element to render instead of default title
- * @property {Function=} renderAfter - function which returns React element to render after appbar
+ * @property {function(routeName: String): JSX.Element=} renderTitle - function which returns React element to render instead of default title
+ * @property {function(): JSX.Element=} renderAfter - function which returns React element to render after appbar
  * @param {Props} props
  */
 const AppBar = ({ route, navigation, previous, renderTitle, renderAfter }) => {
