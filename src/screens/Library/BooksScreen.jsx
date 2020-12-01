@@ -3,12 +3,30 @@ import { View, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { FAB } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { libraryBooks } from '../../redux/selectors';
+import {
+  libraryBooks,
+  libraryFilter,
+  librarySortMethod,
+} from '../../redux/selectors';
 import BookCard, { BOOK_CARD_HEIGHT } from './BookCard';
+import { sortBooks } from './sort';
 
-const BooksScreen = React.memo(({ navigation }) => {
+const BooksScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+
   const books = useSelector(libraryBooks);
+  const sortMethod = useSelector(librarySortMethod);
+  const filter = useSelector(libraryFilter);
+
+  let resultBooks;
+  if (filter) {
+    resultBooks = books.filter((book) =>
+      book.title.toLowerCase().includes(filter.toLowerCase())
+    );
+    resultBooks = sortBooks(resultBooks, sortMethod);
+  } else {
+    resultBooks = sortBooks(books, sortMethod);
+  }
 
   const renderCard = ({ item }) => (
     <BookCard book={item} dispatch={dispatch} navigation={navigation} />
@@ -22,7 +40,7 @@ const BooksScreen = React.memo(({ navigation }) => {
         style={styles.fab}
       />
       <FlatList
-        data={books}
+        data={resultBooks}
         renderItem={renderCard}
         keyExtractor={keyExtractor}
         getItemLayout={getItemLayout}
@@ -30,9 +48,9 @@ const BooksScreen = React.memo(({ navigation }) => {
       />
     </View>
   );
-});
+};
 
-const keyExtractor = (item, index) => 'bookCard' + index; // todo: change to item.id
+const keyExtractor = (item) => item.id;
 
 const getItemLayout = (data, index) => ({
   length: BOOK_CARD_HEIGHT,
@@ -54,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BooksScreen;
+export default React.memo(BooksScreen);

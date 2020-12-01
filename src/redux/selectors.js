@@ -17,4 +17,9 @@ export const libraryActiveBookChapterTitle = (state) => {
 };
 export const libraryActiveBook = (state) =>
   state.library.books.find((book) => book.id === state.library.activeBook);
+/**
+ * @returns {[import('./libraryReducer').Book]}
+ */
 export const libraryBooks = (state) => state.library.books;
+export const librarySortMethod = (state) => state.library.sortMethod;
+export const libraryFilter = (state) => state.library.filter;

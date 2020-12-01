@@ -27,4 +27,4 @@ const styles = StyleSheet.create({
   toggleSpeakingBtn: { marginLeft: 'auto' },
 });
 
-export default ToggleSpeakingButton;
+export default React.memo(ToggleSpeakingButton);

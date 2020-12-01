@@ -7,6 +7,7 @@ import {
   TransitionPresets,
 } from '@react-navigation/stack';
 import { StackHeader } from './../../components/AppBar/StackHeader';
+import LibraryHeader from './LibraryHeader/LibraryHeader';
 
 const Stack = createStackNavigator();
 
@@ -18,10 +19,20 @@ const Library = () => (
     }}
     initialRouteName='Books'
   >
-    <Stack.Screen name='Books' component={BooksScreen} />
+    <Stack.Screen
+      name='Books'
+      component={BooksScreen}
+      options={BooksScreenOptions}
+    />
     <Stack.Screen name='Book Info' component={BookInfo} />
     <Stack.Screen name='Open Book' component={OpenBookScreen} />
   </Stack.Navigator>
 );
+
+const BooksScreenOptions = {
+  header: (props) => (
+    <StackHeader {...props} renderTitle={() => <LibraryHeader />} />
+  ),
+};
 
 export default Library;
