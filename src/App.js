@@ -31,6 +31,11 @@ import { setFontSize, toggleTheme } from './redux/settingsReducer';
 import { initializeApp } from './redux/appReducer';
 import ReaderNavigator from './screens/Reader/ReaderNavigator';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import {
+  libraryActiveBookId,
+  settingsIsDarkTheme,
+  settingsFontSize,
+} from './redux/selectors';
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -61,13 +66,13 @@ const customDefaultTheme = {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState();
-  const activeBook = useSelector((state) => state.library.activeBook);
+  const activeBook = useSelector(libraryActiveBookId);
   const ref = React.useRef(null);
   const dispatch = useDispatch();
 
-  const isDarkTheme = useSelector((state) => state.settings.isDarkTheme);
+  const isDarkTheme = useSelector(settingsIsDarkTheme);
   const theme = isDarkTheme ? customDarkTheme : customDefaultTheme;
-  const fontSize = useSelector((state) => state.settings.fontSize);
+  const fontSize = useSelector(settingsFontSize);
 
   useEffect(() => {
     /**

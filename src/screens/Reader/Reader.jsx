@@ -9,18 +9,25 @@ import {
 } from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
-import { readerIsFetching, readerIsSpeaking } from './../../redux/selectors';
+import {
+  readerCurrent,
+  readerIsFetching,
+  readerIsSpeaking,
+  readerContent,
+  settingsFontSize,
+  libraryActiveBookId,
+} from './../../redux/selectors';
 
 const { width } = Dimensions.get('window');
 
 const Reader = () => {
   const dispatch = useDispatch();
 
-  const fontSize = useSelector((state) => state.settings.fontSize);
+  const fontSize = useSelector(settingsFontSize);
 
-  const current = useSelector((state) => state.reader.current);
+  const current = useSelector(readerCurrent);
   const isReaderNotInit = current.chapter === undefined; // todo: remove after add container for Reader
-  const bookContent = useSelector((state) => state.reader.content);
+  const bookContent = useSelector(readerContent);
   const isFetching = useSelector(readerIsFetching);
 
   const isSpeaking = useSelector(readerIsSpeaking);
@@ -30,7 +37,7 @@ const Reader = () => {
     (isSpeaking && !isSpeakingPrevRef.current);
   isSpeakingPrevRef.current = isSpeaking;
 
-  const activeBookId = useSelector((state) => state.library.activeBook);
+  const activeBookId = useSelector(libraryActiveBookId);
   //initially request chapter content
   useEffect(() => {
     dispatch(getBook());

@@ -15,9 +15,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { readDirectory, readBookFile } from './../../redux/filesReducer';
 import { parseFilePath } from './../../utils/common';
 import { addBook } from './../../redux/libraryReducer';
+import {
+  filesBookFile,
+  filesDirectory,
+  libraryBooks as libraryBooksSelector,
+} from './../../redux/selectors';
 
 const OpenBookScreen = ({ navigation }) => {
-  const libraryBooks = useSelector((state) => state.library.books);
+  const libraryBooks = useSelector(libraryBooksSelector);
 
   const [visible, setVisible] = useState(false); //Snackbar visibility
   const onToggleSnackBar = () => setVisible(!visible);
@@ -32,7 +37,7 @@ const OpenBookScreen = ({ navigation }) => {
     setVisible(true);
   };
 
-  const bookFile = useSelector((state) => state.files.bookFile);
+  const bookFile = useSelector(filesBookFile);
 
   const [expanded, setExpanded] = useState(false); //Storage picker state
   const handlePress = () => {
@@ -43,7 +48,7 @@ const OpenBookScreen = ({ navigation }) => {
     name: 'Internal Storage',
     path: 'file:///storage/emulated/0',
   });
-  const directory = useSelector((state) => state.files.directory);
+  const directory = useSelector(filesDirectory);
   const dispatch = useDispatch();
 
   const pathArr = parseFilePath(directory.path.slice(storage.path.length));

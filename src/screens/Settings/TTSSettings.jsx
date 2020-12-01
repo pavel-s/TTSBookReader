@@ -10,11 +10,12 @@ import { ParamSlider } from './ParamSlider';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTTSOption } from './../../redux/settingsReducer';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { settingsTts } from '../../redux/selectors';
 
 export const TTSSettings = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const ttsOptions = useSelector((state) => state.settings.tts);
+  const ttsOptions = useSelector(settingsTts);
   const setOption = (option, value) =>
     dispatch(setTTSOption({ option, value }));
 

@@ -3,13 +3,14 @@ import { List, ActivityIndicator, TextInput } from 'react-native-paper';
 import { FlatList, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTTSOption } from './../../redux/settingsReducer';
+import { settingsTts, appTtsVoices } from './../../redux/selectors';
 
 const VoiceSelector = () => {
   const dispatch = useDispatch();
 
   const isReady = true; //!!!
-  const ttsOptions = useSelector((state) => state.settings.tts);
-  const voices = useSelector((state) => state.app.other.ttsVoices);
+  const ttsOptions = useSelector(settingsTts);
+  const voices = useSelector(appTtsVoices);
   voices.sort((a, b) => (a.name < b.name ? -1 : 1));
 
   const [filterText, setFilterText] = useState('');
