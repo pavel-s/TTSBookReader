@@ -1,6 +1,5 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import { persistStore, persistReducer } from 'redux-persist';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { persistStore, persistCombineReducers } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
 import appReducer from './appReducer';
 import filesReducer from './filesReducer';
@@ -14,7 +13,7 @@ const persistConfig = {
   whitelist: ['library', 'settings'],
 };
 
-const rootReducer = combineReducers({
+const persistedReducer = persistCombineReducers(persistConfig, {
   app: appReducer,
   files: filesReducer,
   library: libraryReducer,
@@ -22,30 +21,13 @@ const rootReducer = combineReducers({
   settings: settingsReducer,
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-function logger({ getState }) {
-  return (next) => (action) => {
-    // console.log('will dispatch', action.type);
-
-    // Call the next dispatch method in the middleware chain.
-    const returnValue = next(action);
-
-    // console.log('state after dispatch', getState());
-
-    // This will likely be the action itself, unless
-    // a middleware further in chain changed it.
-    return returnValue;
-  };
-}
-
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-const store = createStore(
-  persistedReducer,
-  // applyMiddleware(thunk, logger)
-  composeEnhancers(applyMiddleware(thunk, logger))
-);
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: getDefaultMiddleware({
+    immutableCheck: false,
+    serializableCheck: false,
+  }),
+});
 
 export const persistor = persistStore(store);
 
