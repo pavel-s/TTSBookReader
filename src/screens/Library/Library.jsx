@@ -1,5 +1,5 @@
 import React from 'react';
-import OpenBookScreen from './OpenBookScreen';
+import OpenBookScreen from './OpenBookScreen/OpenBookScreen';
 import BooksScreen from './BooksScreen';
 import BookInfo from './BookInfo';
 import {

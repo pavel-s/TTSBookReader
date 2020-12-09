@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Card, Paragraph, Title } from 'react-native-paper';
-import { setActiveBook } from './../../redux/libraryReducer';
+import { librarySetActiveBook } from './../../redux/libraryReducer';
+import { bookById } from './../../redux/selectors';
+import { useSelector } from 'react-redux';
 
-const BookCard = ({ book, dispatch, navigation }) => {
+const BookCard = ({ bookId, dispatch, navigation }) => {
+  const book = useSelector(bookById(bookId));
   return (
     <Card style={styles.bookCard}>
       <Card.Content style={styles.cardContent}>
@@ -21,7 +24,7 @@ const BookCard = ({ book, dispatch, navigation }) => {
           <Card.Actions style={styles.cardActions}>
             <Button
               onPress={async () => {
-                await dispatch(setActiveBook(book.id));
+                await dispatch(librarySetActiveBook(book.id));
                 navigation.navigate('Reader');
               }}
             >

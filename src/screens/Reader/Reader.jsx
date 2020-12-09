@@ -2,33 +2,25 @@ import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import { StyleSheet, FlatList, Dimensions } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, Surface } from 'react-native-paper';
-import {
-  getBook,
-  goToChapter,
-  toggleSpeaking,
-} from '../../redux/readerReducer';
 import Chapter from './Chapter';
 import { useTheme } from '@react-navigation/native';
+import { fetchBookContent, toggleSpeaking } from './../../redux/readerReducer';
 import {
-  readerCurrent,
-  readerIsFetching,
   readerIsSpeaking,
   readerContent,
   settingsFontSize,
   libraryActiveBookId,
+  activeBookCurrent,
+  readerStatus,
 } from './../../redux/selectors';
+import { bookCurrentUpdated } from '../../redux/booksReducer';
 
 const { width } = Dimensions.get('window');
 
-const Reader = () => {
-  const dispatch = useDispatch();
-
+const Reader = ({ bookContent, activeBookId, dispatch }) => {
   const fontSize = useSelector(settingsFontSize);
 
-  const current = useSelector(readerCurrent);
-  const isReaderNotInit = current.chapter === undefined; // todo: remove after add container for Reader
-  const bookContent = useSelector(readerContent);
-  const isFetching = useSelector(readerIsFetching);
+  const current = useSelector(activeBookCurrent);
 
   const isSpeaking = useSelector(readerIsSpeaking);
   const isSpeakingPrevRef = useRef(isSpeaking);
@@ -36,12 +28,6 @@ const Reader = () => {
     isSpeaking === isSpeakingPrevRef.current ||
     (isSpeaking && !isSpeakingPrevRef.current);
   isSpeakingPrevRef.current = isSpeaking;
-
-  const activeBookId = useSelector(libraryActiveBookId);
-  //initially request chapter content
-  useEffect(() => {
-    dispatch(getBook());
-  }, [activeBookId]);
 
   //styles for chapter
   const themeColors = useTheme().colors;
@@ -66,7 +52,7 @@ const Reader = () => {
   // Horizontal scroll to current chapter cell of FlatList.
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
-    if (!isReaderNotInit && !current.changedByScrolling) {
+    if (!current.changedByScrolling) {
       chaptersScrollRef.current?.scrollToIndex({
         animate: false,
         index: current.chapter,
@@ -106,21 +92,18 @@ const Reader = () => {
   const setCurrentChapter = useCallback(({ viewableItems }) => {
     if (
       viewableItems.length &&
-      viewableItems[0].index !== currentRef.current.chapter &&
-      currentRef.current.chapter !== undefined //isReaderNotInit //todo: remove
+      viewableItems[0].index !== currentRef.current.chapter
     ) {
-      dispatch(goToChapter(viewableItems[0].index, true));
+      dispatch(
+        bookCurrentUpdated({
+          bookId: activeBookId,
+          current: { chapter: viewableItems[0].index, paragraph: 0 },
+        })
+      );
     }
   }, []);
 
-  const initialScrollIndex = useMemo(() => current.chapter, [
-    activeBookId,
-    isReaderNotInit,
-  ]);
-
-  if (isFetching || isReaderNotInit) {
-    return <ActivityIndicator style={styles.container} />;
-  }
+  const initialScrollIndex = useMemo(() => current.chapter, [activeBookId]);
 
   return (
     <Surface style={styles.container}>
@@ -163,4 +146,29 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-export default Reader;
+const ReaderContainer = () => {
+  const dispatch = useDispatch();
+
+  const bookContent = useSelector(readerContent);
+  const status = useSelector(readerStatus);
+  const activeBookId = useSelector(libraryActiveBookId);
+
+  // fetch book content
+  useEffect(() => {
+    dispatch(fetchBookContent());
+  }, [activeBookId]);
+
+  if (status !== 'succeeded') {
+    return <ActivityIndicator style={styles.container} />;
+  }
+
+  return (
+    <Reader
+      bookContent={bookContent}
+      activeBookId={activeBookId}
+      dispatch={dispatch}
+    />
+  );
+};
+
+export default React.memo(ReaderContainer);

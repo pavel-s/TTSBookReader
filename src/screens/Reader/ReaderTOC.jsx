@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, List, Surface, useTheme } from 'react-native-paper';
-import { goToChapter } from '../../redux/readerReducer';
-
 import {
+  activeBookCurrentChapter,
   readerChapterTitles,
-  readerCurrentChapter,
 } from './../../redux/selectors';
+import { activeBookUpdateCurrent } from './../../redux/booksReducer';
 
 // calculated manually, with default styles
 const LIST_ITEM_HEIGHT = 50;
@@ -19,12 +18,14 @@ const ReaderTOC = () => {
   const itemStyles = useMemo(() => makeItemStyles(theme), [theme]);
 
   const chapterTitles = useSelector(readerChapterTitles);
-  const currentChapter = useSelector(readerCurrentChapter);
+  const currentChapter = useSelector(activeBookCurrentChapter);
 
   const itemPressHandlers = useMemo(() =>
-    chapterTitles.map((title, index) => () => dispatch(goToChapter(index)), [
-      chapterTitles,
-    ])
+    chapterTitles.map(
+      (title, index) => () =>
+        dispatch(activeBookUpdateCurrent({ chapter: index, paragraph: 0 })),
+      [chapterTitles]
+    )
   );
 
   const scrollRef = useRef(null);

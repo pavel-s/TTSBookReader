@@ -3,44 +3,57 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { TextInput, Surface, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { goToChapter } from '../../redux/readerReducer';
-import { libraryActiveBook, readerShowNav } from '../../redux/selectors';
+import { activeBookUpdateCurrent } from '../../redux/booksReducer';
+// import { goToChapter } from '../../redux/readerReducer';
+import {
+  activeBookCurrent,
+  libraryActiveBook,
+  readerShowNav,
+  readerChapterTitles,
+} from './../../redux/selectors';
 
 const ReaderNavMenu = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const book = useSelector(libraryActiveBook);
+  // const book = useSelector(libraryActiveBook);
+  const bookCurrent = useSelector(activeBookCurrent);
+  const bookTitles = useSelector(readerChapterTitles);
 
-  const [inputValue, setInputValue] = useState(
-    String(book?.bookmark.chapter + 1)
-  );
+  const [inputValue, setInputValue] = useState(String(bookCurrent.chapter + 1));
 
   // update inputValue when book was changed
   useEffect(() => {
-    setInputValue(String(book?.bookmark.chapter + 1));
-  }, [book]);
+    setInputValue(String(bookCurrent.chapter + 1));
+  }, [bookCurrent]);
 
   // set and dispatch index on input change
   const handleTextChange = useCallback(
     (value) => {
       let number = +value;
       if (number > 0 && Number.isInteger(number)) {
-        if (number < book?.chaptersList.length) {
+        if (number < bookTitles.length) {
           // use current index
-          dispatch(goToChapter(number - 1)); // note: index start from 1 in ui
+          dispatch(
+            activeBookUpdateCurrent({ chapter: number - 1, paragraph: 0 })
+          ); // note: index start from 1 in ui
           setInputValue(value);
         } else {
           // use last available index
-          dispatch(goToChapter(book?.chaptersList.length - 2));
-          setInputValue(String(book?.chaptersList.length - 2));
+          dispatch(
+            activeBookUpdateCurrent({
+              chapter: bookTitles.length - 2,
+              paragraph: 0,
+            })
+          );
+          setInputValue(String(bookTitles.length - 2));
         }
       } else {
         // clear input
         setInputValue('');
       }
     },
-    [book?.chaptersList.length]
+    [bookTitles.length]
   );
 
   return (

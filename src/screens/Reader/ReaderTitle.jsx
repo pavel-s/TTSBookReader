@@ -2,17 +2,14 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Title, List, useTheme, TouchableRipple } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  libraryActiveBookChapterTitle,
-  readerShowNav,
-} from '../../redux/selectors';
+import { readerCurrentTitle, readerShowNav } from '../../redux/selectors';
 import { toggleShowNav } from './../../redux/readerReducer';
 
 const ReaderTitle = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const title = useSelector(libraryActiveBookChapterTitle);
+  const title = useSelector(readerCurrentTitle);
   const showBookNav = useSelector(readerShowNav);
 
   const onPress = () => dispatch(toggleShowNav());

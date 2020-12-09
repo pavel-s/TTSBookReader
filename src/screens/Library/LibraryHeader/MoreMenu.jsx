@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Appbar, Caption, Menu, useTheme } from 'react-native-paper';
 import { useSelector } from 'react-redux';
-import { setSortMethod, SORT_METHODS } from '../../../redux/libraryReducer';
-import { librarySortMethod } from '../../../redux/selectors';
+import {
+  librarySetSortMethod,
+  setSortMethod,
+  SORT_METHODS,
+} from '../../../redux/libraryReducer';
+import { librarySortMethod } from './../../../redux/selectors';
 
 const MoreMenu = ({ dispatch }) => {
   const theme = useTheme();
@@ -16,7 +20,7 @@ const MoreMenu = ({ dispatch }) => {
   const menuItems = Object.values(SORT_METHODS).map((method) => {
     const handlePress = () =>
       dispatch(
-        setSortMethod({
+        librarySetSortMethod({
           name: method,
           ascend: method === sortMethod.name ? !sortMethod.ascend : true,
         })

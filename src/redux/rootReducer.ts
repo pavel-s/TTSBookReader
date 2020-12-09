@@ -1,34 +1,28 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import { persistStore, persistCombineReducers } from 'redux-persist';
+import { persistCombineReducers } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
 import appReducer from './appReducer';
 import filesReducer from './filesReducer';
 import libraryReducer from './libraryReducer';
 import readerReducer from './readerReducer';
 import settingsReducer from './settingsReducer';
+import booksReducer from './booksReducer';
+import { createSelectorHook } from 'react-redux';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['library', 'settings'],
+  whitelist: ['library', 'settings', 'books'],
 };
 
-const persistedReducer = persistCombineReducers(persistConfig, {
+export const persistedReducer = persistCombineReducers(persistConfig, {
   app: appReducer,
   files: filesReducer,
   library: libraryReducer,
   reader: readerReducer,
   settings: settingsReducer,
+  books: booksReducer,
 });
 
-const store = configureStore({
-  reducer: persistedReducer,
-  middleware: getDefaultMiddleware({
-    immutableCheck: false,
-    serializableCheck: false,
-  }),
-});
+export type RootState = ReturnType<typeof persistedReducer>;
 
-export const persistor = persistStore(store);
-
-export default store;
+export const useTypedSelector = createSelectorHook<RootState>();
