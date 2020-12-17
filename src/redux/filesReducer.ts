@@ -13,7 +13,7 @@ interface FilesState {
   isReading: boolean;
 }
 
-const initialState2: FilesState = {
+const initialState: FilesState = {
   directory: null,
   storages: [{ name: 'internal', path: 'file:///storage/emulated/0' }],
   currentStorage: 0,
@@ -32,12 +32,19 @@ export const getDirectory = createAsyncThunk<
     currentStorage
   ];
   const pathArr = parseFilePath(path, storagePath, storageName);
-  return { isDirectory: true, name, path, children, pathArr };
+  return {
+    isDirectory: true,
+    name,
+    path,
+    children,
+    pathArr,
+    storage: files.currentStorage,
+  };
 });
 
 const filesSlice = createSlice({
   name: 'files',
-  initialState: initialState2,
+  initialState: initialState,
   reducers: {
     setDirectory(state, { payload }: PayloadAction<FSDirectoryEntry>) {
       state.directory = payload;

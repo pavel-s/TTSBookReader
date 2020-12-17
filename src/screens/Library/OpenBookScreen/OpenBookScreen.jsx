@@ -1,7 +1,7 @@
 /**
  * show file system entries, select book file
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import {
   List,
@@ -12,7 +12,6 @@ import {
   Surface,
 } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { parseFilePath } from '../../../utils/common';
 import { fetchAndAddBook } from '../../../redux/booksReducer';
 import useSnackbar from './../../../hooks/useSnackbar';
 import Storages from './Storages';
@@ -25,9 +24,11 @@ import {
   filesCurrentStorage,
   filesIsReading,
 } from './../../../redux/selectors';
+import withFSPermission from './../../../components/hoc/withFSPermission';
 
 const OpenBookScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+
   const { visible, message, onDismiss, showSuccess, showError } = useSnackbar();
 
   const [storagesVisible, setStoragesVisible] = useState(false);
@@ -40,8 +41,10 @@ const OpenBookScreen = ({ navigation }) => {
   const currentStorage = useSelector(filesCurrentStorage);
 
   useEffect(() => {
-    dispatch(getDirectory(storages[currentStorage]));
-  }, [storages, currentStorage]);
+    if (!directory || directory.storage !== currentStorage) {
+      dispatch(getDirectory(storages[currentStorage]));
+    }
+  }, [storages, currentStorage, directory]);
 
   if (isReading || !directory) {
     return <ActivityIndicator style={styles.container} />;
@@ -158,4 +161,4 @@ const styles = StyleSheet.create({
   snackbar: { position: 'absolute', bottom: 0 },
 });
 
-export default React.memo(OpenBookScreen);
+export default React.memo(withFSPermission(OpenBookScreen));

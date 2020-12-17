@@ -14,6 +14,7 @@ import {
   readerStatus,
 } from './../../redux/selectors';
 import { bookCurrentUpdated } from '../../redux/booksReducer';
+import withFSPermission from './../../components/hoc/withFSPermission';
 
 const { width } = Dimensions.get('window');
 
@@ -171,4 +172,4 @@ const ReaderContainer = () => {
   );
 };
 
-export default React.memo(ReaderContainer);
+export default React.memo(withFSPermission(ReaderContainer));

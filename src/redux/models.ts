@@ -69,6 +69,7 @@ export interface FSDirectoryEntry extends FSEntry {
   isDirectory: true;
   children: FSEntry[];
   pathArr: { name: string; path: string }[];
+  storage: number;
 }
 
 export interface FSStorage {
