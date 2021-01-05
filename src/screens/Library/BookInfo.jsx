@@ -17,7 +17,12 @@ const BookInfo = ({ route }) => {
       <Surface style={styles.container}>
         <Title style={styles.title}>{book.title}</Title>
         {book.image && (
-          <Image source={{ uri: book.image }} style={styles.image} />
+          <Image
+            source={{
+              uri: book.image,
+            }}
+            style={styles.image}
+          />
         )}
 
         {book.novelupdatesPage && (

@@ -28,9 +28,9 @@ export const tts = {
     new Promise((resolve, reject) => {
       Speech.speak(text, {
         ...options,
-        onStopped: resolve,
-        onPause: resolve,
-        onDone: resolve,
+        onStopped: () => resolve('stop'),
+        onPause: () => resolve('pause'),
+        onDone: () => resolve('done'),
         onError: reject,
       });
     }),

@@ -5,6 +5,7 @@ import { File } from './models';
 import { FSDirectoryEntry, FSStorage } from './models';
 import { parseFilePath } from './../utils/common';
 import { RootState } from './rootReducer';
+import { FileSystem } from 'react-native-unimodules';
 
 interface FilesState {
   directory: FSDirectoryEntry;
@@ -15,7 +16,10 @@ interface FilesState {
 
 const initialState: FilesState = {
   directory: null,
-  storages: [{ name: 'internal', path: 'file:///storage/emulated/0' }],
+  storages: [
+    { name: 'internal', path: 'file:///storage/emulated/0' },
+    { name: 'documents', path: FileSystem.documentDirectory },
+  ],
   currentStorage: 0,
   isReading: false,
 };

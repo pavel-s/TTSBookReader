@@ -2,14 +2,13 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
-  EntityState,
   nanoid,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { Book, Bookmark, Current, File, BookFileJSON } from './models';
+import { Book, Bookmark, Current } from './models';
 import { RootState } from './rootReducer';
-import { fs } from './../api/fs';
 import { AppDispatch } from './store';
+import { readBookFile } from './../api/book';
 
 interface AddBookmarkPayload {
   bookId: string;
@@ -30,30 +29,39 @@ interface FetchAndAddBookPayload {
   book: Book;
   isUpdate: boolean;
 }
+
+interface File {
+  name: string;
+  path: string;
+}
+
 export const fetchAndAddBook = createAsyncThunk<
   FetchAndAddBookPayload,
   File,
   { state: RootState }
 >('books/fetchBook', async (file, { getState }) => {
-  const json = (await fs.readBook(file.path)) as BookFileJSON;
+  const state = getState();
+
+  const { book } = await readBookFile(file);
+
   return {
     book: {
-      id: json.id,
-      title: json.title,
-      description: json.description,
-      novelupdatesPage: json.novelupdatesPage,
-      image: json.image,
-      file: file,
+      id: book.id || nanoid(),
+      title: book.title,
+      description: book.description,
+      novelupdatesPage: book.novelupdatesPage,
+      image: book.image,
+      author: book.author,
+      language: book.language,
+      file: book.file,
+      chaptersList: book.chaptersList,
       current: { chapter: 0, paragraph: 0 },
       bookmarks: [],
       createdAt: Date.now(),
-      fileCreatedAt: json.createdAt,
-      fileUpdatedAt: json.updatedAt,
-      chaptersList: Object.values(json.chapters).map(
-        (chapter) => chapter.title
-      ),
+      fileCreatedAt: book.createdAt,
+      fileUpdatedAt: book.updatedAt,
     },
-    isUpdate: !!getState().books.entities[json.id],
+    isUpdate: !!state.books.entities[book.id],
   };
 });
 

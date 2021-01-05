@@ -1,6 +1,10 @@
 export interface File {
   name: string;
   path: string;
+  type?: 'json' | 'epub';
+  /** path to dir with parsed epub book (json, images, etc.) */
+  cacheDir?: string;
+  md5?: string;
 }
 
 export interface Current {
@@ -31,6 +35,8 @@ export interface Book {
   fileCreatedAt?: number;
   fileUpdatedAt?: number;
   chaptersList?: string[];
+  author?: string;
+  language?: string;
 }
 
 type ChapterParagraph = { text: string };

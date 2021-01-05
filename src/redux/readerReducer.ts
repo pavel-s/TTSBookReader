@@ -6,6 +6,7 @@ import { bookCurrentUpdated } from './booksReducer';
 import { BookFileJSON, Chapter } from './models';
 import { RootState } from './rootReducer';
 import { AppDispatch } from './store';
+import { readBookFile } from './../api/book';
 
 type TTSStatus = 'speaking' | 'pause' | 'stop';
 
@@ -36,12 +37,11 @@ export const fetchBookContent = createAsyncThunk<
   thunkApi.dispatch(contentRequested());
 
   const state = thunkApi.getState();
-  const path = bookById(bookId || state.library.activeBook)(state).file.path;
-  const json = (await fs.readBook(path)) as BookFileJSON;
-  const content = Object.values(json.chapters).map(
-    (chapter) => chapter.content
-  );
-  const titles = Object.values(json.chapters).map((chapter) => chapter.title);
+  const file = bookById(bookId || state.library.activeBook)(state).file;
+
+  const result = await readBookFile(file);
+  const content = result.chapters;
+  const titles = result.book.chaptersList;
 
   return {
     content,
