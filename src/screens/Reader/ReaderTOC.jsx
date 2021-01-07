@@ -41,7 +41,7 @@ const ReaderTOC = () => {
     const isCurrent = currentChapter === index;
     return (
       <ListItem
-        title={title}
+        title={index + 1 + ' - ' + title}
         titleStyles={itemStyles}
         handlePress={!isCurrent && itemPressHandlers[index]}
       />

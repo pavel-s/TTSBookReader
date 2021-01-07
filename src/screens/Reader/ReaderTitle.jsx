@@ -1,20 +1,35 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Title, List, useTheme, TouchableRipple } from 'react-native-paper';
+import {
+  Title,
+  List,
+  useTheme,
+  TouchableRipple,
+  Caption,
+} from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { readerCurrentTitle, readerShowNav } from '../../redux/selectors';
 import { toggleShowNav } from './../../redux/readerReducer';
+import {
+  activeBookCurrent,
+  activeBookCurrentChapter,
+  readerChapterTitles,
+  readerShowNav,
+} from './../../redux/selectors';
 
 const ReaderTitle = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const title = useSelector(readerCurrentTitle);
+  const index = useSelector(activeBookCurrentChapter);
+  const titles = useSelector(readerChapterTitles);
+
   const showBookNav = useSelector(readerShowNav);
 
   const onPress = () => dispatch(toggleShowNav());
 
-  if (!title) return null;
+  if (!titles) return null;
+
+  const title = titles[index];
 
   return (
     <TouchableRipple
@@ -27,7 +42,7 @@ const ReaderTitle = () => {
           style={[styles.title, { color: theme.colors.onPrimary }]}
           numberOfLines={2}
         >
-          {title}
+          {title ? title : <Caption>{index + 1}</Caption>}
         </Title>
         <List.Icon
           icon={showBookNav ? 'chevron-up' : 'chevron-down'}
@@ -53,7 +68,11 @@ const styles = StyleSheet.create({
     bottom: -22,
     opacity: 0.5,
   },
-  title: { marginLeft: 10, fontSize: 18, lineHeight: 20 },
+  title: {
+    marginLeft: 10,
+    fontSize: 18,
+    lineHeight: 20,
+  },
 });
 
 export default React.memo(ReaderTitle);
