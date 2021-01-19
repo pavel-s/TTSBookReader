@@ -108,3 +108,32 @@ export const parseChapterNode = (
     images,
   };
 };
+
+/**
+ * parse epub v3 xhtml navigation
+ * @param tocString
+ */
+export const parseTOCv3 = (tocString: string) => {
+  const links = parse(tocString).querySelectorAll('nav a');
+  const resultList = new Map<string, string>();
+  links.forEach((link) => {
+    if (!link.attributes.href.includes('#')) {
+      resultList.set(link.attributes.href, link.text);
+    }
+  });
+
+  return resultList;
+};
+
+// const parseNavPoint = (navPoint: NavPoint) => {
+//   if (Array.isArray(navPoint)) {
+//     navPoint.forEach((node) => parseNavPoint(node));
+//   } else {
+//     if (!navPoint.content['@_src'].includes('#')) {
+//       titleList.set(navPoint.content['@_src'], navPoint.navLabel.text);
+//     }
+//     if (navPoint.navPoint) {
+//       parseNavPoint(navPoint.navPoint);
+//     }
+//   }
+// };

@@ -2,7 +2,7 @@ import { Book, Chapter } from '../../redux/models';
 import { unzipPath } from './zip';
 import * as parser from 'fast-xml-parser';
 import { FileSystem } from 'react-native-unimodules';
-import { parseChapterNode } from './parseXHTML';
+import { parseChapterNode, parseTOCv3 } from './parseXHTML';
 import { register } from './cacheRegister';
 import { getBasePath } from './../../utils/common';
 import { resolve } from 'url';
@@ -28,12 +28,12 @@ export const parseEpub = async ({
 
   const packageObj = await getPackage(packagePath);
 
-  const epubVersion = packageObj['@_version'];
-  if (epubVersion >= 3) {
-    throw new Error('Unsupported epub version');
-  }
+  const epubVersion = Number(packageObj['@_version']);
+  // if (epubVersion >= 3) {
+  //   throw new Error('Unsupported epub version');
+  // }
 
-  const info = getEpubInfo(packageObj);
+  const info = getEpubInfo(packageObj, epubVersion);
   let chapters: Chapter[];
 
   const cacheDir = (await register.get(info.id)).item.dir;
@@ -56,7 +56,7 @@ export const parseEpub = async ({
     info.image = imageToCopy.target;
   }
 
-  const chaptersList = await parseTOC(packageObj, packageDir);
+  const chaptersList = await parseTOC(packageObj, packageDir, epubVersion);
   // ncx toc may not be full (poor generated epub file)
   // therefore verify chaptersList with pathsToChapters from package.spine
   const finalChaptersList = pathsToChapters.map(
@@ -100,9 +100,14 @@ const getPackage = async (path: string) => {
 };
 
 const makeChaptersPaths = (packageJson) => {
-  const guideItems = Array.isArray(packageJson.guide.reference)
-    ? packageJson.guide.reference.map((guideItem) => guideItem['@_href'])
-    : [packageJson.guide.reference];
+  // todo: for version >= 3 find guide items in nav landmarks
+  // https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf2-guide
+  const guideItems = packageJson.guide
+    ? Array.isArray(packageJson.guide.reference)
+      ? packageJson.guide.reference.map((guideItem) => guideItem['@_href'])
+      : [packageJson.guide.reference]
+    : [];
+
   return packageJson.spine.itemref.reduce((acc, spinItem) => {
     const href = packageJson.manifest.item.find(
       (manifestItem) => manifestItem['@_id'] === spinItem['@_idref']
@@ -139,16 +144,24 @@ const parseChapters = async (
   return await Promise.all(promises);
 };
 
-const getEpubInfo = (packageObj): EpubMeta => {
+const getEpubInfo = (packageObj, version: number): EpubMeta => {
   const meta = packageObj.metadata;
   const title = getXmlValue(meta['dc:title']);
   const author = getXmlValue(meta['dc:creator']);
   const language = getXmlValue(meta['dc:language']);
   const id = getId(packageObj);
-  const imageId = getCover(packageObj);
-  const image = packageObj.manifest.item.find(
-    (item) => item['@_id'] === imageId
-  )?.['@_href'];
+  let image: string;
+  if (version < 3) {
+    const imageId = getCover(packageObj);
+    image = packageObj.manifest.item.find((item) => item['@_id'] === imageId)?.[
+      '@_href'
+    ];
+  }
+  if (version >= 3) {
+    image = packageObj.manifest.item.find(
+      (item) => item['@_properties'] === 'cover-image'
+    )?.['@_href'];
+  }
 
   return { title, author, language, id, image };
 };
@@ -212,8 +225,13 @@ const getCover = (packageObj): string => {
   }
 };
 
-const getTOCPath = (packageObj): string => {
-  const node = packageObj.manifest.item.find((item) => item['@_id'] === 'ncx');
+const getTOCPath = (packageObj, version: number): string => {
+  const predicate =
+    version < 3
+      ? (item) => item['@_id'] === 'ncx'
+      : (item) => item['@_properties'] === 'nav';
+
+  const node = packageObj.manifest.item.find(predicate);
   return node['@_href'];
 };
 
@@ -226,30 +244,41 @@ type NavPoint =
   | NavPoint[];
 
 /** parse TOC file and return list of chapters titles */
-const parseTOC = async (packageObj, dir): Promise<Map<string, string>> => {
-  const path = getTOCPath(packageObj);
+const parseTOC = async (
+  packageObj,
+  dir: string,
+  version: number
+): Promise<Map<string, string>> => {
+  const path = getTOCPath(packageObj, version);
   const tocString = await FileSystem.readAsStringAsync(dir + path);
-  const tocObj = await parser.parse(tocString, {
-    ignoreAttributes: false,
-  });
 
-  const titleList = new Map<string, string>();
-  const parseNavPoint = (navPoint: NavPoint) => {
-    if (Array.isArray(navPoint)) {
-      navPoint.forEach((node) => parseNavPoint(node));
-    } else {
-      if (!navPoint.content['@_src'].includes('#')) {
-        titleList.set(navPoint.content['@_src'], navPoint.navLabel.text);
+  if (version < 3) {
+    const tocObj = await parser.parse(tocString, {
+      ignoreAttributes: false,
+    });
+
+    const titleList = new Map<string, string>();
+    const parseNavPoint = (navPoint: NavPoint) => {
+      if (Array.isArray(navPoint)) {
+        navPoint.forEach((node) => parseNavPoint(node));
+      } else {
+        if (!navPoint.content['@_src'].includes('#')) {
+          titleList.set(navPoint.content['@_src'], navPoint.navLabel.text);
+        }
+        if (navPoint.navPoint) {
+          parseNavPoint(navPoint.navPoint);
+        }
       }
-      if (navPoint.navPoint) {
-        parseNavPoint(navPoint.navPoint);
-      }
-    }
-  };
+    };
 
-  parseNavPoint(tocObj.ncx.navMap.navPoint);
+    parseNavPoint(tocObj.ncx.navMap.navPoint);
 
-  return titleList;
+    return titleList;
+  }
+
+  if (version >= 3) {
+    return parseTOCv3(tocString);
+  }
 };
 
 const copyImagesToCache = async (
