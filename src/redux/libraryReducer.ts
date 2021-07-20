@@ -1,6 +1,7 @@
 // todo: cancel speakFrom thunk when change activeBook
 import { createSlice } from '@reduxjs/toolkit';
 import { PayloadAction } from '@reduxjs/toolkit';
+import { clearLibrary } from './actions';
 
 export const SORT_METHODS = {
   none: 'none',
@@ -39,6 +40,11 @@ const librarySlice = createSlice({
     librarySetSortMethod(state, { payload }: PayloadAction<SortMethod>) {
       state.sortMethod = payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(clearLibrary.fulfilled, (state) => {
+      state.activeBook = null;
+    });
   },
 });
 

@@ -84,6 +84,7 @@ export const parseChapterNode = (
         // Whitespace node, postponed output
         currentBlock.prependWhitespace = true;
       } else {
+        // var text = node.structuredText;
         var text = node.text;
         if (currentBlock.prependWhitespace) {
           text = ' ' + text;

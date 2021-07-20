@@ -1,11 +1,12 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Surface } from 'react-native-paper';
+import { Surface, Button } from 'react-native-paper';
 import { TransitionPresets } from '@react-navigation/stack';
 import VoiceSelector from './VoiceSelector';
 import { TTSSettings } from './TTSSettings';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StackHeader } from './../../components/AppBar/StackHeader';
+import LibrarySettings from './LibrarySetting';
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ const Settings = ({ navigation }) => {
     <Surface style={styles.container}>
       <ScrollView style={styles.scrollContainer}>
         <TTSSettings navigation={navigation} />
+        <LibrarySettings />
       </ScrollView>
     </Surface>
   );

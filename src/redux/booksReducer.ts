@@ -8,7 +8,8 @@ import {
 import { Book, Bookmark, Current } from './models';
 import { RootState } from './rootReducer';
 import { AppDispatch } from './store';
-import { readBookFile } from './../api/book';
+import { readBookFile, clearBooksCache } from './../api/book';
+import { clearLibrary } from './actions';
 
 interface AddBookmarkPayload {
   bookId: string;
@@ -131,6 +132,9 @@ const booksSlice = createSlice({
         booksAdapter.addOne(state, book);
       }
     );
+    builder.addCase(clearLibrary.fulfilled, (state) => {
+      booksAdapter.removeAll(state);
+    });
   },
 });
 

@@ -2,6 +2,7 @@ import { Book, BookFileJSON, Chapter, File } from '../redux/models';
 import { getFileExtension } from './../utils/common';
 import epubToJson from './epub';
 import { fs } from './fs';
+import { register } from './epub/cacheRegister';
 
 export type ReadBookFileResult = { book?: Partial<Book>; chapters?: Chapter[] };
 
@@ -48,4 +49,8 @@ export const readBookFile = async (
     default:
       throw new Error('Unknown file format');
   }
+};
+
+export const clearBooksCache = async () => {
+  await register.clear();
 };

@@ -3,7 +3,7 @@ import { StyleSheet, FlatList, Dimensions } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import Chapter from './Chapter';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { fetchBookContent, toggleSpeaking } from './../../redux/readerReducer';
 import {
   readerIsSpeaking,
@@ -15,6 +15,7 @@ import {
 } from './../../redux/selectors';
 import { bookCurrentUpdated } from '../../redux/booksReducer';
 import withFSPermission from './../../components/hoc/withFSPermission';
+import useNavigateTo from './../../hooks/useNavigateTo';
 
 const { width } = Dimensions.get('window');
 
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
 
 const ReaderContainer = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const bookContent = useSelector(readerContent);
   const status = useSelector(readerStatus);

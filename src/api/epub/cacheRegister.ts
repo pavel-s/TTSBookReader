@@ -18,6 +18,7 @@ type Register = {
     create?: boolean
   ) => Promise<{ item: RegisterItem; created: boolean }>;
   remove: (id: string) => Promise<void>;
+  clear: () => Promise<void>;
 };
 
 export const register: Register = {
@@ -65,5 +66,10 @@ export const register: Register = {
     await FileSystem.deleteAsync(_items[itemIndex].dir);
     _items.splice(itemIndex, 1);
     this._saveRegister(_items);
+  },
+
+  async clear() {
+    await FileSystem.deleteAsync(CACHE_DIRECTORY, { idempotent: true });
+    await this._saveRegister([]);
   },
 };

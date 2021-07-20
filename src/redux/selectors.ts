@@ -70,10 +70,10 @@ export const bookById = (id: string) => (state: RootState) =>
 
 export const activeBookCurrent = (state: RootState) => {
   const id = libraryActiveBookId(state);
-  return bookById(id)(state).current;
+  return bookById(id)(state)?.current;
 };
 
 export const activeBookCurrentChapter = (state: RootState) => {
   const id = libraryActiveBookId(state);
-  return bookById(id)(state).current.chapter;
+  return bookById(id)(state)?.current.chapter;
 };
