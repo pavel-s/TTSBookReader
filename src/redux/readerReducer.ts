@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { tts } from '../api/tts';
 import { bookById, activeBookCurrent } from './selectors';
 import { fs } from './../api/fs';
-import { bookCurrentUpdated } from './booksReducer';
+import { bookCurrentUpdated, syncBookmarkSet } from './booksReducer';
 import { BookFileJSON, Chapter } from './models';
 import { RootState } from './rootReducer';
 import { AppDispatch } from './store';
@@ -109,10 +109,11 @@ export const speakFrom = createAsyncThunk<
   }
 });
 
-export const stopSpeaking = createAsyncThunk(
+export const stopSpeaking = createAsyncThunk<void, void, { state: RootState }>(
   'reader/stopSpeaking',
-  async () => {
+  async (_, { dispatch }) => {
     await tts.stop();
+    dispatch(syncBookmarkSet());
   }
 );
 
@@ -128,16 +129,14 @@ export const stopSpeaking = createAsyncThunk(
 //   }
 // });
 
-export const toggleSpeaking = (index: number) => (
-  dispatch: AppDispatch,
-  getState: () => RootState
-) => {
-  if (getState().reader.ttsStatus === 'speaking') {
-    dispatch(stopSpeaking());
-  } else {
-    dispatch(speakFrom(index));
-  }
-};
+export const toggleSpeaking =
+  (index: number) => (dispatch: AppDispatch, getState: () => RootState) => {
+    if (getState().reader.ttsStatus === 'speaking') {
+      dispatch(stopSpeaking());
+    } else {
+      dispatch(speakFrom(index));
+    }
+  };
 
 const initialState: ReaderState = {
   status: 'idle',
@@ -195,10 +194,7 @@ const readerSlice = createSlice({
   },
 });
 
-export const {
-  contentRequested,
-  setTtsStatus,
-  toggleShowNav,
-} = readerSlice.actions;
+export const { contentRequested, setTtsStatus, toggleShowNav } =
+  readerSlice.actions;
 
 export default readerSlice.reducer;

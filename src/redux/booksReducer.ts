@@ -10,6 +10,7 @@ import { RootState } from './rootReducer';
 import { AppDispatch } from './store';
 import { readBookFile, clearBooksCache } from './../api/book';
 import { clearLibrary } from './actions';
+import { syncApi, TBookmark } from '../api/sync';
 
 interface AddBookmarkPayload {
   bookId: string;
@@ -66,18 +67,47 @@ export const fetchAndAddBook = createAsyncThunk<
   };
 });
 
-export const activeBookUpdateCurrent = (current: Current) => (
-  dispatch: AppDispatch,
-  getState: () => RootState
-) => {
+export const activeBookUpdateCurrent =
+  (current: Current) => (dispatch: AppDispatch, getState: () => RootState) => {
+    const state = getState();
+    dispatch(
+      bookCurrentUpdated({
+        bookId: state.library.activeBook,
+        current,
+      })
+    );
+  };
+
+export const syncBookmarkGet = createAsyncThunk<
+  { id: string; bookmark: TBookmark },
+  void,
+  { state: RootState }
+>('reader/syncBookmarkGet', async (_, { getState }) => {
+  const id = getState().library.activeBook;
+  const bookmark = await syncApi.getBookmark(id);
+  if (bookmark) {
+    return { id, bookmark };
+  }
+  throw new Error();
+});
+
+export const syncBookmarkSet = createAsyncThunk<
+  void,
+  void,
+  {
+    state: RootState;
+  }
+>('reader/syncBookmarkSet', async (_, { getState }) => {
   const state = getState();
-  dispatch(
-    bookCurrentUpdated({
-      bookId: state.library.activeBook,
-      current,
-    })
-  );
-};
+  const id = state.library.activeBook;
+
+  const requestBody = {
+    id,
+    bookmark: state.books.entities[id].current,
+  };
+
+  await syncApi.setBookmark(requestBody);
+});
 
 const booksAdapter = createEntityAdapter<Book>();
 
@@ -134,6 +164,14 @@ const booksSlice = createSlice({
     );
     builder.addCase(clearLibrary.fulfilled, (state) => {
       booksAdapter.removeAll(state);
+    });
+    builder.addCase(syncBookmarkGet.fulfilled, (state, { payload }) => {
+      booksAdapter.updateOne(state, {
+        id: payload.id,
+        changes: {
+          current: payload.bookmark,
+        },
+      });
     });
   },
 });

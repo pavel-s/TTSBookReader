@@ -48,10 +48,7 @@ const librarySlice = createSlice({
   },
 });
 
-export const {
-  librarySetActiveBook,
-  librarySetFilter,
-  librarySetSortMethod,
-} = librarySlice.actions;
+export const { librarySetActiveBook, librarySetFilter, librarySetSortMethod } =
+  librarySlice.actions;
 
 export default librarySlice.reducer;

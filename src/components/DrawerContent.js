@@ -11,6 +11,8 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { syncBookmarkGet, syncBookmarkSet } from '../redux/booksReducer';
 
 const DrawerContent = ({
   props,
@@ -19,6 +21,16 @@ const DrawerContent = ({
   fontSize,
   setFontSize,
 }) => {
+  const dispatch = useDispatch(syncBookmarkGet);
+
+  const handleGetBookmark = () => {
+    dispatch(syncBookmarkGet());
+  };
+
+  const handleSetBookmark = () => {
+    dispatch(syncBookmarkSet());
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <Drawer.Section>
@@ -50,6 +62,18 @@ const DrawerContent = ({
             />
           </View>
         </View>
+      </Drawer.Section>
+      <Drawer.Section title='Sync'>
+        <Drawer.Item
+          label='Get Bookmark'
+          onPress={handleGetBookmark}
+          icon='cloud-download-outline'
+        />
+        <Drawer.Item
+          label='Set Bookmark'
+          onPress={handleSetBookmark}
+          icon='cloud-upload-outline'
+        />
       </Drawer.Section>
     </DrawerContentScrollView>
   );
