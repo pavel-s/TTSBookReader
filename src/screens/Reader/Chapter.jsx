@@ -12,8 +12,9 @@ import useMounted from './../../hooks/useMounted';
 import ChapterFooter from './ChapterFooter';
 
 const ChapterParagraph = React.memo(
-  ({ item, index, isActive, handlePressParagraph, chapterStyles }) =>
-    item.image ? (
+  ({ item, index, isActive, handlePressParagraph, chapterStyles }) => {
+    if (isActive) console.log(item.text);
+    return item.image ? (
       <Img
         source={{ uri: item.image }}
         screenPadding={chapterStyles.content.padding}
@@ -26,9 +27,10 @@ const ChapterParagraph = React.memo(
           isActive && chapterStyles.activeParagraph,
         ]}
       >
-        {Constants.isDevice ? item.text : index + item.text}
+        {item.text}
       </Text>
-    )
+    );
+  }
 );
 
 const maxToRenderPerBatch = 28;
@@ -56,15 +58,18 @@ const Chapter = ({
 
   // if loadUntilCurrent is true - set initialNumToRender = current.paragraph + 1 to load all items (paragraphs)
   // up to current index. After that we can scroll to needed index
-  const [loadUntilCurrent, setLoadUntilCurrent] = useState(
-    isCurrentNotInWindow
-  );
+  const [loadUntilCurrent, setLoadUntilCurrent] =
+    useState(isCurrentNotInWindow);
 
   const scrollToCurrentParagraph = useCallback(() => {
-    scrollRef.current?.scrollToIndex({
-      animate: true,
-      index: currentParagraphRef.current,
-    });
+    try {
+      scrollRef.current?.scrollToIndex({
+        animate: true,
+        index: currentParagraphRef.current,
+      });
+    } catch (error) {
+      console.log('paragraph scroll error', error);
+    }
   }, []);
 
   // scroll to current paragraph

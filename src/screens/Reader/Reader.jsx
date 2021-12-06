@@ -55,18 +55,26 @@ const Reader = ({ bookContent, activeBookId, dispatch }) => {
   const chaptersScrollRef = useRef(null);
   useEffect(() => {
     if (!current.changedByScrolling) {
-      chaptersScrollRef.current?.scrollToIndex({
-        animate: false,
-        index: current.chapter,
-      });
+      try {
+        chaptersScrollRef.current?.scrollToIndex({
+          animate: false,
+          index: current.chapter,
+        });
+      } catch (error) {
+        console.log('chapter scroll error', error);
+      }
     }
   }, [current.chapter]);
 
   const scrollToNextChapter = useCallback((currentIndex) => {
-    chaptersScrollRef.current?.scrollToIndex({
-      animate: true,
-      index: currentIndex + 1,
-    });
+    try {
+      chaptersScrollRef.current?.scrollToIndex({
+        animate: true,
+        index: currentIndex + 1,
+      });
+    } catch (error) {
+      console.log('next chapter scroll error', error);
+    }
   }, []);
 
   const handlePressParagraph = useCallback((index) => {

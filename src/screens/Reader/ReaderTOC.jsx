@@ -32,8 +32,12 @@ const ReaderTOC = () => {
 
   // scroll to current item
   useEffect(() => {
-    if (currentChapter) {
-      scrollRef.current?.scrollToIndex({ index: currentChapter });
+    try {
+      if (currentChapter) {
+        scrollRef.current?.scrollToIndex({ index: currentChapter });
+      }
+    } catch (error) {
+      console.log('toc chapter scroll error', error);
     }
   }, [currentChapter]);
 

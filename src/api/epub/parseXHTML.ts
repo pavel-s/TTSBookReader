@@ -103,7 +103,8 @@ export const parseChapterNode = (
         text: block
           .join('')
           .trim()
-          .replace(/\s{2,}/g, ' '),
+          .replace(/\s{2,}/g, ' ') // clear excessive whitespace
+          .replace(/\n/g, ''), // clear excessive '\n'
       };
     }),
     images,
