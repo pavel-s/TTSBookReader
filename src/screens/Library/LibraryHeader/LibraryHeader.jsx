@@ -1,9 +1,9 @@
 import { throttle } from 'lodash';
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFilter } from '../../../redux/libraryReducer';
+import { librarySetFilter } from '../../../redux/libraryReducer';
 import { libraryFilter } from '../../../redux/selectors';
 import MoreMenu from './MoreMenu';
 
@@ -18,7 +18,7 @@ const LibraryHeader = () => {
 
   const handleTextChange = useMemo(() => {
     const setBooksFilterThrottled = throttle(
-      (filter) => dispatch(setFilter(filter)),
+      (filter) => dispatch(librarySetFilter(filter)),
       THROTTLE_WAIT
     );
     return (value) => {
